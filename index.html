@@ -1,108 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>디지털시스템설계 노트</title>
+<title>EECE274 디지털시스템설계 노트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/study-note.css">
 </head>
 <body>
-<div class="paper">
-  <div class="course">EECE274 &middot; 디지털시스템설계 &middot; POSTECH</div>
-  <h1>디지털시스템설계 노트</h1>
-  <div class="sub">Seokhyeong Kang &middot; 개념 정리본 &middot; 중간고사 범위 L02&ndash;L12</div>
-
-  <section>
-    <h2>시험 전 한 장</h2>
-    <a class="card" href="cheatsheet.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">요약</span>중간고사 한 장 요약</div>
-      <div class="card-d">L02&ndash;L12 핵심 공식 &middot; 정의 &middot; 조건 모음</div>
-    </a>
-  </section>
-
-  <section>
-    <h2>조합 논리</h2>
-    <a class="card" href="l02.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L02</span>부울 대수</div>
-      <div class="card-d">드모르간 &middot; 쌍대성 &middot; 합의 정리</div>
-    </a>
-    <a class="card" href="l03.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L03</span>정준형</div>
-      <div class="card-d">minterm &middot; SoP/PoS &middot; &Sigma;m 표기</div>
-    </a>
-    <a class="card" href="l04.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L04</span>카르노 맵</div>
-      <div class="card-d">Gray code &middot; 2&#8319; 묶음 &middot; don&prime;t care</div>
-    </a>
-    <a class="card" href="l05.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L05</span>논리 최소화</div>
-      <div class="card-d">PI &middot; EPI &middot; Q-M</div>
-    </a>
-    <a class="card" href="l06.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L06</span>다단 논리</div>
-      <div class="card-d">factoring &middot; NAND-NAND</div>
-    </a>
-    <a class="card" href="l07.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L07</span>해저드</div>
-      <div class="card-d">static/dynamic &middot; hazard-free</div>
-    </a>
-    <a class="card" href="l08.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L08</span>구현 기술</div>
-      <div class="card-d">mux &middot; LUT &middot; PLA</div>
-    </a>
-  </section>
-
-  <section>
-    <h2>산술 논리</h2>
-    <a class="card" href="l09.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L09</span>수 체계와 가산기</div>
-      <div class="card-d">2의 보수 &middot; overflow &middot; CLA</div>
-    </a>
-    <a class="card" href="l10.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L10</span>곱셈</div>
-      <div class="card-d">array multiplier &middot; carry-save</div>
-    </a>
-  </section>
-
-  <section>
-    <h2>순차 논리</h2>
-    <a class="card" href="l11.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L11</span>순차 논리 소자</div>
-      <div class="card-d">R-S latch &middot; D latch &middot; 플립플롭</div>
-    </a>
-    <a class="card" href="l12.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L12</span>타이밍</div>
-      <div class="card-d">setup/hold &middot; skew</div>
-    </a>
-  </section>
-
-  <section>
-    <h2>개요</h2>
-    <a class="card" href="l01.html">
-      <span class="go">&rarr;</span>
-      <div class="card-t"><span class="no">L01</span>디지털 시스템 개요</div>
-      <div class="card-d">강의 로드맵</div>
-    </a>
-  </section>
-
-  <div class="notice"><b>읽는 법</b> &middot; 파랑은 핵심 용어, 빨강은 주의점, 노랑은 형광펜. 검정 박스는 개념 문장과 공식뿐이다.</div>
-
-  <div class="foot">그림은 정리용 자체 제작.</div>
+<article class="paper">
+<div class="phead"><span class="phead-c">EECE274 &middot; 디지털시스템설계</span><span class="phead-r">POSTECH</span></div>
+<h1 class="pagetitle">디지털시스템설계 노트</h1>
+<p class="psub">강의 L01 ~ L12 개념 정리</p>
+<div class="body notes">
+<h2>개요</h2><div class="idx"><a href="l01.html"><span class="n">L01</span>디지털 시스템 개요</a></div><h2>조합 논리</h2><div class="idx"><a href="l02.html"><span class="n">L02</span>조합 논리 (1) 부울 대수</a><a href="l03.html"><span class="n">L03</span>조합 논리 (2) 정준형</a><a href="l04.html"><span class="n">L04</span>조합 논리 (3) 카르노 맵</a><a href="l05.html"><span class="n">L05</span>논리 최소화 PI와 EPI</a><a href="l06.html"><span class="n">L06</span>다단 논리</a><a href="l07.html"><span class="n">L07</span>시간 응답 해저드</a><a href="l08.html"><span class="n">L08</span>조합 논리 구현 기술</a></div><h2>산술 논리</h2><div class="idx"><a href="l09.html"><span class="n">L09</span>산술 논리 (1) 수 체계와 가산기</a><a href="l10.html"><span class="n">L10</span>산술 논리 (2) 곱셈</a></div><h2>순차 논리</h2><div class="idx"><a href="l11.html"><span class="n">L11</span>순차 논리 소자</a><a href="l12.html"><span class="n">L12</span>타이밍 방법론과 레지스터</a></div>
 </div>
+</article>
 </body>
 </html>

@@ -1,4 +1,11 @@
 /* ============================================================
+   study-note kit v3 — 공부 노트 사이트 공용 스타일 (2026-10-21)
+   v3 변경: 불릿 리듬(간격·행간·들여쓰기), h3 소제목 플레인 가로선,
+   표 여백, 디스플레이 수식 위아래 여백, 불릿 리드어 .lt 추가.
+   (구조 규칙 — 한 불릿 한 생각/비교형 표/강조 절제 —은 생성 규칙 문서)
+   v2 이하 클래스명은 전부 유지.
+   ============================================================ */
+/* ---- v2 이력 ----
    study-note kit v2 — 공부 노트 사이트 공용 스타일 (2026-10-21)
    흰 페이지 · Noto Sans KR · 손글씨 노트 "느낌"은 위계/들여쓰기/색으로
    파랑 = 핵심 용어 · 빨강 = 주의/조건 · 노랑 = 형광펜
@@ -38,28 +45,33 @@ h1.pagetitle{font-size:25px;font-weight:900;letter-spacing:-0.01em;margin:22px 0
 /* ---------- 본문 노트 ---------- */
 .notes h2{font-size:19px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;margin:36px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--rule)}
 .notes h2 .h2no{color:var(--blue);margin-right:.35em}
-.notes h3{font-size:16px;font-weight:700;color:var(--ink);margin:24px 0 8px}
-.notes h4{font-size:15px;font-weight:700;color:#333;margin:16px 0 6px}
+.notes h3{font-size:16px;font-weight:700;color:var(--ink);margin:36px 0 10px;padding-top:16px;border-top:1px solid #e2e2e2}
+.notes h2 + .refline + h3,.notes h2 + h3{border-top:none;padding-top:0;margin-top:20px}
+.notes h4{font-size:15px;font-weight:700;color:#333;margin:22px 0 8px}
 .notes p{margin:.35em 0}
-.notes ul{list-style:none;margin:.3em 0;padding-left:0}
-.notes ul li{position:relative;padding-left:1.25em;margin:.22em 0;line-height:1.7}
+.notes ul{list-style:none;margin:.6em 0;padding-left:0}
+.notes ul li{position:relative;padding-left:1.3em;margin:.55em 0;line-height:1.78}
 .notes ul li::before{content:"•";position:absolute;left:.3em;color:var(--ink)}
-.notes ul ul{margin:.15em 0;padding-left:1.15em}
+.notes ul ul{margin:.4em 0 .5em;padding-left:1.35em}
+.notes ul ul li{margin:.38em 0;line-height:1.7}
 .notes ul ul li::before{content:"–";color:#555}
-.notes ul ul ul{padding-left:1.15em}
+.notes ul ul ul{padding-left:1.2em}
+.notes ul ul ul li{margin:.28em 0}
 .notes ul ul ul li::before{content:"·";color:#999}
-.notes ol{margin:.3em 0;padding-left:1.7em}
-.notes ol li{margin:.22em 0;line-height:1.7}
+.notes ol{margin:.5em 0;padding-left:1.7em}
+.notes ol li{margin:.45em 0;line-height:1.78}
+/* 불릿 리드어: 항목 이름은 파랑 대신 굵은 본문색 */
+.notes .lt{font-weight:700;color:var(--ink)}
 .notes ol ol{list-style:lower-alpha}
 .notes code{font-family:ui-monospace,SFMono-Regular,Menlo,'Noto Sans KR',monospace;font-size:.88em;background:#f3f3f3;padding:.05em .35em;border-radius:3px}
 .notes p.note{color:#555;font-size:14.5px}
 .refline{font-size:12.5px;color:var(--gray);margin:2px 0 10px}
 
 /* 표: booktabs형 (세로선 없이 굵은 상하선 + 얇은 헤더선) */
-.tblwrap{overflow-x:auto;margin:14px 0}
-.notes table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;font-variant-numeric:tabular-nums;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
+.tblwrap{overflow-x:auto;margin:18px 0}
+.notes table{border-collapse:collapse;width:100%;margin:18px 0;font-size:15px;font-variant-numeric:tabular-nums;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
 .tblwrap table{margin:0}
-.notes td,.notes th{border:none;padding:7px 12px;vertical-align:top;line-height:1.6;text-align:left}
+.notes td,.notes th{border:none;padding:9px 12px;vertical-align:top;line-height:1.65;text-align:left}
 .notes thead th{border-bottom:1px solid var(--rule);font-weight:700;white-space:nowrap}
 .notes tbody tr+tr td,.notes tbody tr+tr th{border-top:1px solid #e2e2e2}
 .notes table .num{text-align:right}
@@ -95,7 +107,8 @@ h1.pagetitle{font-size:25px;font-weight:900;letter-spacing:-0.01em;margin:22px 0
    박스로 보고 싶은 페이지(HW5 형식)는 본문 컨테이너에 .boxmath 추가 */
 .mjx{display:inline!important}
 .mjx svg{display:inline-block!important;overflow:visible}
-.mjx-display{margin:.45em 0;overflow-x:auto;overflow-y:hidden;padding:2px 0;text-align:center}
+.mjx-display{margin:.8em 0;overflow-x:auto;overflow-y:hidden;padding:4px 0;text-align:center}
+.notes li .mjx-display,.nb .mjx-display{text-align:left;margin:.55em 0}
 .mjx-display svg{display:inline-block!important;margin:0 auto}
 .boxmath .mjx-display{border:1px solid var(--rule);padding:8px 14px;margin:10px 0}
 
@@ -258,3 +271,48 @@ ol.steps .mjx-display{text-align:left;margin:.35em 0}
   article.prob-page{break-before:page}
   article.prob-page:first-of-type{break-before:avoid}
 }
+
+/* ---- v3 색 팔레트 확정 (2026-10-21, 유저 위임 결정) ----
+   교과서/논문 도판 톤: 본문·그림 = 검정/진회색 잉크 + 회색만.
+   파스텔 채움·파랑·초록 제거. 강조색 = 짙은 적색 1개, 섹션당 핵심 1곳.
+   형광펜 노랑 유지(섹션당 1개까지). */
+:root{
+  --accent:#9e2b25;   /* 유일 강조색: 차분한 짙은 적색 */
+  --soft:#f2f2f2;     /* 보조 채움 회색(1단계만) */
+  --hairline:#d9d9d9; /* 가는 구분선 */
+  --edge:#555555;     /* 도판 화살표·보조선 */
+}
+.k-blue{color:var(--ink);font-weight:700}        /* 파랑 리드어 → 볼드 검정 */
+.k-red{color:var(--accent);font-weight:700}
+.k-green{color:var(--ink);font-weight:700}
+.notes h2 .h2no{color:var(--gray)}
+ol.steps > li::before{color:var(--gray)}         /* Step 번호 회색 */
+.notes details.tg summary::before{color:var(--gray)}
+.pd summary:hover{color:var(--ink)}.pd summary:hover::before{color:var(--ink)}
+.pd summary:focus-visible{outline-color:var(--gray)}
+a.to-home:hover{color:var(--ink);border-color:var(--ink)}
+.pnav a:hover{color:var(--ink);border-color:var(--ink)}
+.stat{border-color:var(--hairline);background:#fff;border-radius:4px}
+.stat .v{color:var(--ink)}
+.stat.warn2{background:#fff;border-color:var(--accent)}
+.stat.warn2 .v{color:var(--accent)}.stat.warn2 .l{color:var(--gray)}
+.xl td.hlcell{background:var(--soft);color:var(--ink)}
+.xl td.warn{background:#fff;color:var(--accent);font-weight:700}
+.dlg-row .opt .on::before{color:var(--accent)}
+.dlg-btn.primary{background:var(--ink);border-color:var(--ink)}
+/* 도판(인라인 SVG) 공통: 채움은 흰색/#f2f2f2만, 선은 잉크·회색, rx 최소 */
+.notes figure svg rect,.notes figure svg path{vector-effect:non-scaling-stroke}
+
+.ov{text-decoration:overline}
+.idx a{display:block;color:var(--ink);text-decoration:none;padding:11px 2px;border-top:1px solid #d9d9d9;font-size:16px}
+.idx a:first-child{border-top:none}
+.idx a:last-child{border-bottom:1px solid #d9d9d9}
+.idx a .n{display:inline-block;width:3.2em;font-weight:700}
+.idx a .s{color:#666;font-size:13.5px;margin-left:.6em}
+.idx a:hover{background:#f7f7f7}
+.paper .sub{font-size:14.5px;color:#555}
+.tbl-c td,.tbl-c th{text-align:center!important}
+.notes table.tt td,.notes table.tt th{padding:5px 14px}
+.notes table.tt{width:auto;margin:14px auto}
+.sep{border:none;border-top:1px solid #d9d9d9;margin:18px 0}
+.tsub{font-size:14.5px;color:#555;margin:2px 0 8px}

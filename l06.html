@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L06. 다단 논리 (Multilevel Logic)</title>
+<title>L06 다단 논리 (Multilevel Logic)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -14,47 +14,14 @@
 <div class="phead">
   <a class="to-home" href="index.html">&larr; 목차</a>
   <span class="phead-c">L06 &middot; 다단 논리 (Multilevel Logic)</span>
-  <span class="pmeta phead-r">EECE274 &middot; 디지털시스템설계</span>
+  <span class="phead-r">EECE274 &middot; 디지털시스템설계</span>
 </div>
-
 <h1 class="pagetitle">L06. 다단 논리 (Multilevel Logic)</h1>
-<p class="psub">Multilevel Logic / Time Response · 중간고사 범위</p>
+<p class="psub">Multilevel Logic</p>
 <div class="body notes">
-
-<div class="bx"><b>핵심 정리.</b> 2단 논리(SoP)는 팬인이 커지고 게이트가 많아진다 → 공통 부분을 뽑아(factoring) <b>다단</b>으로 만들면 게이트·입력 수는 줄지만 <b>지연 단수는 늘어난다</b>. SoP ↔ NAND-NAND, PoS ↔ NOR-NOR는 그대로 치환 가능.</div>
-
-<h2><span class="h2no">6.1</span>왜 다단인가</h2>
-
-
-<p>직관: F = AB + AC + AD = A(B + C + D) — A를 한 번만 쓴다.</p>
-<ul>
-<li>2단: 구조가 단순하고 빠르지만, 항이 많으면 AND 게이트 입력 수(팬인)와 게이트 수가 폭증.</li>
-<li>다단: 공통 인수·공통 부분식을 분리해 회로를 작게. 대가는 신호 경로가 길어져 지연 ↑.</li>
-</ul>
-
-
-<h2><span class="h2no">6.2</span>NAND/NOR 등가 회로</h2>
-
-
-<p>드모르간에 의해 같은 함수를 여러 게이트 조합으로 구현 가능:</p>
-<ul>
-<li><b>SoP → NAND-NAND</b>: AND-OR를 그대로 NAND-NAND로 치환.</li>
-<li><b>PoS → NOR-NOR</b>: OR-AND를 그대로 NOR-NOR로 치환.</li>
-</ul>
-<p class="note">이유: (AB)′′ = AB처럼 이중 부정이 상쇄되기 때문. NAND·NOR가 범용 게이트라는 사실의 직접적 활용.</p>
-
-
-<h3>SoP 회로의 등가 변환</h3>
-
-
-<figure><img src="assets/fig/l06_net.png" style="max-width:620px" alt=""><figcaption>F = AB + CD의 AND-OR, NAND-NAND, NOR-OR, OR-NAND 등가 네트워크</figcaption></figure>
-
-
-<div class="takeaway"><b>한 줄 정리</b> &middot; 다단 = 회로 크기 ↓ / 지연 ↑ 트레이드오프; AND-OR ↔ NAND-NAND 치환 규칙은 암기.</div>
-
-<div class="pnav"><a href="l05.html">&larr; L05. PI와 EPI</a><a href="index.html">목차</a><a href="l07.html">L07. 해저드 &rarr;</a></div>
+<h2><span class="h2no">6.1</span>다단 논리</h2><ul><li><span class="lt">2단 논리</span>: 구조가 단순하고 빠르다. 항이 많아지면 AND 게이트의 입력 수(fan-in)와 게이트 수가 크게 늘어난다.</li><li><span class="lt">다단 논리(multilevel)</span>: 공통 인수나 공통 부분식을 뽑아서(factoring) 회로를 작게 만든다.</li><li>게이트 수와 입력 수는 줄지만, 신호가 지나는 단 수가 늘어 지연이 커질 수 있다.</li></ul><div class="nb"><h4>예 — factoring</h4><p>F = AC + AD + BC + BD + E</p><div class="tblwrap"><table class=""><thead><tr><th></th><th>식</th><th>게이트</th><th>게이트 입력 수</th><th>단 수</th></tr></thead><tbody><tr><td>2단 SoP</td><td>AC + AD + BC + BD + E</td><td>AND2 4개 + OR5 1개</td><td>8 + 5 = 13</td><td>2</td></tr><tr><td>factoring</td><td>(A + B)(C + D) + E</td><td>OR2 2개 + AND2 1개 + OR2 1개</td><td>2 + 2 + 2 + 2 = 8</td><td>3</td></tr></tbody></table></div><p>입력 수는 13에서 8로 줄고, 단 수는 2에서 3으로 늘었다.</p></div><h2><span class="h2no">6.2</span>NAND와 NOR로 바꾸기</h2><div class="bx"><p>드모르간으로 AND-OR 회로의 게이트를 다른 종류로 바꿔도 같은 함수를 얻는다. 그림 (A) → (C) 는 SoP 를 NAND-NAND 로 바꾸는 것이다.</p></div><ul><li>AB = (A′ + B′)′ 이므로 AND 하나는 입력을 보수로 한 NOR 와 같다. (B)</li><li>(AB)′ = A′ + B′ 이므로 NAND 하나는 입력을 보수로 한 OR 와 같다. (D)</li><li>(C): 첫 단 NAND 의 출력이 (AB)′, (CD)′ 이고, 둘째 단 NAND 가 ((AB)′ · (CD)′)′ = AB + CD 를 만든다.</li></ul><figure><svg viewBox="0 0 700 350" width="700" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto" role="img"><text x="10" y="16" font-size="13" text-anchor="start" fill="#1a1a1a" font-weight="700" font-family="'Noto Sans KR',sans-serif" >(A) AND-OR</text><path d="M50,32 H77.0 A22.0,22.0 0 0 1 77.0,76 H50 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M50,112 H77.0 A22.0,22.0 0 0 1 77.0,156 H50 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M160,72 Q189.7,72 214,94.0 Q189.7,116 160,116 Q171.88,94.0 160,72 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><line x1="30" y1="43.0" x2="50" y2="43.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="47.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >A</text><line x1="30" y1="65.0" x2="50" y2="65.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="69.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >B</text><line x1="30" y1="123.0" x2="50" y2="123.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="127.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >C</text><line x1="30" y1="145.0" x2="50" y2="145.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="149.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >D</text><polyline points="99.0,54.0 138,54.0 138,83.0 160,83.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><polyline points="99.0,134.0 138,134.0 138,105.0 160,105.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><line x1="214" y1="94.0" x2="236" y2="94.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="242" y="98.0" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >F</text><text x="350" y="16" font-size="13" text-anchor="start" fill="#1a1a1a" font-weight="700" font-family="'Noto Sans KR',sans-serif" >(B) NOR-OR</text><path d="M390,32 Q419.7,32 444,54.0 Q419.7,76 390,76 Q401.88,54.0 390,32 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="448" cy="54.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M390,112 Q419.7,112 444,134.0 Q419.7,156 390,156 Q401.88,134.0 390,112 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="448" cy="134.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M500,72 Q529.7,72 554,94.0 Q529.7,116 500,116 Q511.88,94.0 500,72 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><line x1="370" y1="43.0" x2="390" y2="43.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="47.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >A′</text><line x1="370" y1="65.0" x2="390" y2="65.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="69.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >B′</text><line x1="370" y1="123.0" x2="390" y2="123.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="127.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >C′</text><line x1="370" y1="145.0" x2="390" y2="145.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="149.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >D′</text><polyline points="452,54.0 478,54.0 478,83.0 500,83.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><polyline points="452,134.0 478,134.0 478,105.0 500,105.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><line x1="554" y1="94.0" x2="576" y2="94.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="582" y="98.0" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >F</text><text x="10" y="196" font-size="13" text-anchor="start" fill="#1a1a1a" font-weight="700" font-family="'Noto Sans KR',sans-serif" >(C) NAND-NAND</text><path d="M50,212 H77.0 A22.0,22.0 0 0 1 77.0,256 H50 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="103.0" cy="234.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M50,292 H77.0 A22.0,22.0 0 0 1 77.0,336 H50 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="103.0" cy="314.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M160,252 H187.0 A22.0,22.0 0 0 1 187.0,296 H160 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="213.0" cy="274.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><line x1="30" y1="223.0" x2="50" y2="223.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="227.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >A</text><line x1="30" y1="245.0" x2="50" y2="245.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="249.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >B</text><line x1="30" y1="303.0" x2="50" y2="303.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="307.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >C</text><line x1="30" y1="325.0" x2="50" y2="325.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="24" y="329.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >D</text><polyline points="107.0,234.0 138,234.0 138,263.0 160,263.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><polyline points="107.0,314.0 138,314.0 138,285.0 160,285.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><line x1="217.0" y1="274.0" x2="239.0" y2="274.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="245.0" y="278.0" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >F</text><text x="350" y="196" font-size="13" text-anchor="start" fill="#1a1a1a" font-weight="700" font-family="'Noto Sans KR',sans-serif" >(D) OR-NAND</text><path d="M390,212 Q419.7,212 444,234.0 Q419.7,256 390,256 Q401.88,234.0 390,212 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M390,292 Q419.7,292 444,314.0 Q419.7,336 390,336 Q401.88,314.0 390,292 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><path d="M500,252 H527.0 A22.0,22.0 0 0 1 527.0,296 H500 Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><circle cx="553.0" cy="274.0" r="4" fill="#fff" stroke="#1a1a1a" stroke-width="1.3"/><line x1="370" y1="223.0" x2="390" y2="223.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="227.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >A′</text><line x1="370" y1="245.0" x2="390" y2="245.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="249.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >B′</text><line x1="370" y1="303.0" x2="390" y2="303.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="307.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >C′</text><line x1="370" y1="325.0" x2="390" y2="325.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="364" y="329.0" font-size="12" text-anchor="end" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >D′</text><polyline points="444,234.0 478,234.0 478,263.0 500,263.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><polyline points="444,314.0 478,314.0 478,285.0 500,285.0" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><line x1="557.0" y1="274.0" x2="579.0" y2="274.0" stroke="#1a1a1a" stroke-width="1.2"/><text x="585.0" y="278.0" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="400" font-family="'Noto Sans KR',sans-serif" >F</text></svg><figcaption>F = AB + CD 를 네 가지 2단 회로로 구현한 것. 네 회로는 모두 같은 함수다.</figcaption></figure><div class="tblwrap"><table class=""><thead><tr><th>회로</th><th>첫 단</th><th>둘째 단</th><th>입력</th></tr></thead><tbody><tr><td>(A) AND-OR</td><td>AND</td><td>OR</td><td>A, B, C, D</td></tr><tr><td>(B) NOR-OR</td><td>NOR</td><td>OR</td><td>A′, B′, C′, D′</td></tr><tr><td>(C) NAND-NAND</td><td>NAND</td><td>NAND</td><td>A, B, C, D</td></tr><tr><td>(D) OR-NAND</td><td>OR</td><td>NAND</td><td>A′, B′, C′, D′</td></tr></tbody></table></div><ul><li>실제 회로에서는 NAND 와 NOR 가 AND, OR 보다 작고 빠르다. 그래서 SoP 를 NAND-NAND 로 만드는 것이 가장 흔하다.</li></ul>
 </div>
+<div class="pnav"><a href="l05.html">&larr; L05</a><a href="index.html">목차</a><a href="l07.html">L07 &rarr;</a></div>
 </article>
-<script>window.addEventListener('beforeprint',function(){document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','')})});</script>
 </body>
 </html>
