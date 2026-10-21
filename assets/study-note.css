@@ -373,3 +373,15 @@ a.to-home{padding:3px 10px}
 .exrow{border-left:2px solid #d9d9d9;padding-left:10px;color:#444}
 .notes li.exrow,li.exrow{list-style:none !important;margin-left:-1.2em;padding-left:12px}
 .phead{grid-template-columns:auto 1fr auto}.phead-c{text-align:center}
+
+.tbl-c tr.rep th,tr.rep th{border-top:1px solid #1a1a1a;background:#f7f7f7;font-weight:700}
+.notes h2 a.tap{display:inline-block;margin:0 0 0 8px;padding:4px 36px 4px 12px;font-size:.8em}
+@media(max-width:600px){figure{overflow-x:auto}figure svg{max-width:none !important;height:auto}figure figcaption{position:sticky;left:0}}
+
+a.tap{position:relative;border:1px solid #bdbdbd;border-radius:4px;background:#fff;color:var(--ink) !important;text-decoration:none !important;font-weight:700;cursor:pointer;transition:background .12s,border-color .12s,transform .12s}
+a.tap::after{content:"\2192";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#777;font-weight:400}
+a.tap:hover{background:#f2f2f2;border-color:#1a1a1a}
+a.tap:active{transform:translateY(1px)}
+a.tap:focus-visible{outline:2px solid #1a1a1a;outline-offset:2px}
+.notes h2 a.tap{vertical-align:middle}
+.paper .psub+.body .idx:first-child,.idx:first-child{margin-top:16px}
