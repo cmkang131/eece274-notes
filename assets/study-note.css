@@ -369,3 +369,7 @@ a.to-home{padding:3px 10px}
 .idx a:focus-visible,.pnav a:focus-visible,a.to-home:focus-visible,.to-root:focus-visible,.theme-toggle:focus-visible{outline:2px solid #1a1a1a;outline-offset:2px}
 .theme-toggle{cursor:pointer}.theme-toggle:hover{background:#f2f2f2}
 @media print{.idx a::after{content:none}}
+
+.exrow{border-left:2px solid #d9d9d9;padding-left:10px;color:#444}
+.notes li.exrow,li.exrow{list-style:none !important;margin-left:-1.2em;padding-left:12px}
+.phead{grid-template-columns:auto 1fr auto}.phead-c{text-align:center}
