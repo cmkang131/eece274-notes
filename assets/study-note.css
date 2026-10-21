@@ -385,3 +385,5 @@ a.tap:active{transform:translateY(1px)}
 a.tap:focus-visible{outline:2px solid #1a1a1a;outline-offset:2px}
 .notes h2 a.tap{vertical-align:middle}
 .paper .psub+.body .idx:first-child,.idx:first-child{margin-top:16px}
+.ln{display:block;margin:4px 0 2px}ul.ps{margin:.4em 0}.notes ol.steps li ul{margin:.3em 0;padding-left:1.2em}.notes ol.steps li ul li{counter-increment:none;position:static;padding-left:0;margin:.15em 0;list-style:disc}.notes ol.steps li ul li::before{content:none}
+ol.cols{columns:2;column-gap:28px;margin:.4em 0;padding-left:0;list-style:none}ol.cols li{break-inside:avoid;margin:2px 0}@media(max-width:600px){ol.cols{columns:1}}
