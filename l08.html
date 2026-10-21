@@ -1,93 +1,58 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>L08. 조합 논리 구현 기술</title>
-<style>
-@font-face{font-family:'Noto Sans KR';src:url('assets/fonts/noto.woff') format('woff');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Nanum Pen';src:url('assets/fonts/nanum.woff') format('woff');font-display:swap}
-
-:root{--ink:#111;--gray:#666;--blue:#1e4f9f}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;background:#fff;color:var(--ink)}
-img.eq{vertical-align:-0.15em}
-.page{max-width:880px;margin:0 auto;background:#fff;position:relative;padding:34px 60px 90px}
-.main{font-size:17px;line-height:1.75}
-.main p{margin:.45em 0}
-.phead{display:flex;justify-content:space-between;align-items:baseline;
-  font-size:14px;color:var(--gray);padding-bottom:8px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
-.phead a{color:var(--gray);text-decoration:none}
-.phead .course{font-weight:700;color:var(--ink)}
-h1.doct{font-size:23px;font-weight:700;margin:6px 0 4px}
-.sub{color:var(--gray);font-size:15px;margin-bottom:8px}
-.sec{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--ink)}
-.sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
-.sec-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
-.sec-label.blue{color:var(--blue)}
-.box{border:1.5px solid #111;padding:12px 18px;margin:10px 0;background:#fff}
-.def{margin:.4em 0;text-align:center}
-.cond{font-size:15px;color:var(--gray)}
-ul.tight li{margin:.3em 0 .3em 1.2em}
-ol.tight li{margin:.3em 0 .3em 1.2em}
-.tt{border-collapse:collapse;margin:10px auto}
-.tt th,.tt td{border:1px solid #111;padding:3px 12px;text-align:center;font-size:15.5px}
-.tt th{font-weight:700}
-.fig{margin:16px 0;text-align:center}
-.fig img{width:100%}
-.fig-cap{font-size:14px;color:var(--gray);margin-top:6px}
-.summary{margin-top:34px;border:1.5px solid #111;padding:10px 16px;font-size:16px}
-.pfoot{margin-top:48px;font-size:14px;border-top:1px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between}
-.pfoot a{color:var(--gray);text-decoration:none}
-.badge{display:inline-block;border:1px solid #111;font-size:13px;padding:1px 8px;margin-left:8px;vertical-align:middle}
-.tlist{margin:6px 0 18px}
-.tlist a{color:var(--ink);text-decoration:none}
-.tlist .row{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid #ddd}
-.tlist .row:last-child{border-bottom:none}
-.tlist .no{flex:0 0 52px;font-weight:700}
-.tlist .ti{flex:1}
-.tlist .kw{color:var(--gray);font-size:14.5px}
-.grp{font-weight:700;font-size:16px;margin:22px 0 4px}
-@media (max-width:760px){
-  .page{padding:22px 18px 60px}
-  .main{font-size:16px}
-  .tlist .kw{display:none}
-}
-@media print{
-  body{background:#fff}
-  .page{max-width:none;padding:10px 24px}
-  .sec{break-inside:avoid-page}
-}
-
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/study-note.css">
 </head>
 <body>
-<div class="page"><div class="main">
-<div class="phead"><span class="course">EECE274 디지털시스템설계 · 개념 정리본</span><a href="index.html">← 전체 목차</a></div>
-<h1 class="doct">L08. 조합 논리 구현 기술</h1>
-<p class="sub">Combinational Logic Technologies · 중간고사 범위</p>
-<div class="box"><b>핵심 정리.</b> 구현 방식 3종: <b>fixed gates</b>(직접 논리 게이트) · <b>LUT</b>(진리표를 메모리에 저장, FPGA) · <b>template-based</b>(PLA: AND plane + OR plane 프로그래밍). mux 하나로도 임의 함수 구현 가능 — 선택 입력에 변수, 데이터 입력에 나머지 변수의 함수.</div>
-<div class="sec">
-<div class="sec-label blue">개념 · mux로 조합 논리 설계</div>
+<article class="paper">
+<div class="phead">
+  <a class="to-home" href="index.html">&larr; 목차</a>
+  <span class="phead-c">L08 &middot; 조합 논리 구현 기술</span>
+  <span class="pmeta phead-r">EECE274 &middot; 디지털시스템설계</span>
+</div>
+
+<h1 class="pagetitle">L08. 조합 논리 구현 기술</h1>
+<p class="psub">Combinational Logic Technologies · 중간고사 범위</p>
+<div class="body notes">
+
+<div class="bx"><b>핵심 정리.</b> 구현 방식 3종: <b>fixed gates</b>(직접 논리 게이트) · <b>LUT</b>(진리표를 메모리에 저장, FPGA) · <b>template-based</b>(PLA: AND plane + OR plane 프로그래밍). mux 하나로도 임의 함수 구현 가능 — 선택 입력에 변수, 데이터 입력에 나머지 변수의 함수.</div>
+
+<h2><span class="h2no">8.1</span>mux로 조합 논리 설계</h2>
+
+
 <p>직관: mux = 선택 입력이 고르는 진리표.</p>
-<div class="box">4:1 mux에 선택 입력 A, B를 걸고 데이터 입력을 C의 함수로 두면 3변수 함수 구현:<br>
+<div class="bx">4:1 mux에 선택 입력 A, B를 걸고 데이터 입력을 C의 함수로 두면 3변수 함수 구현:<br>
 I₀ = C̄, I₁ = C̄, I₂ = 1, I₃ = 1 → F(A,B,C) 결정.<br>
 규칙: 선택 입력 조합(행)마다 남은 변수 값에 따른 F 값을 데이터 입력에 배선.</div>
-</div>
-<div class="sec">
-<div class="sec-label blue">개념 · PLA (Programmable Logic Array)</div>
-<ul class="tight">
+
+
+<h2><span class="h2no">8.2</span>PLA (Programmable Logic Array)</h2>
+
+
+<ul>
 <li>AND plane: 필요한 <b>곱항</b>들을 프로그래밍해 생성.</li>
 <li>OR plane: 곱항들을 선택해 합산 → 여러 출력 함수 동시 구현.</li>
 <li>여러 함수가 <b>같은 곱항을 공유</b>할 수 있어 PROM보다 면적 효율적.</li>
 </ul>
-</div>
-<div class="sec">
-<div class="sec-label">그림 · mux 설계와 PLA</div>
-<div class="fig"><img src="assets/fig/l08_pla.png" style="max-width:620px" alt=""><div class="fig-cap">4:1 mux로 3변수 함수 구현(위), PLA 프로그래밍 전/후(아래)</div></div>
-</div>
-<div class="summary">한 줄 요약: fixed gates / LUT / PLA 중 무엇으로 구현하든 논리 함수는 같다 — mux 데이터 입력 배선과 PLA의 AND·OR plane 역할을 설명할 수 있으면 충분.</div>
 
-</div></div>
+
+<h3>mux 설계와 PLA</h3>
+
+
+<figure><img src="assets/fig/l08_pla.png" style="max-width:620px" alt=""><figcaption>4:1 mux로 3변수 함수 구현(위), PLA 프로그래밍 전/후(아래)</figcaption></figure>
+
+
+<div class="takeaway"><b>한 줄 정리</b> &middot; fixed gates / LUT / PLA 중 무엇으로 구현하든 논리 함수는 같다 — mux 데이터 입력 배선과 PLA의 AND·OR plane 역할을 설명할 수 있으면 충분.</div>
+
+<div class="pnav"><a href="l07.html">&larr; L07. 해저드</a><a href="index.html">목차</a><a href="l09.html">L09. 수 체계와 가산기 &rarr;</a></div>
+</div>
+</article>
+<script>window.addEventListener('beforeprint',function(){document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','')})});</script>
 </body>
 </html>

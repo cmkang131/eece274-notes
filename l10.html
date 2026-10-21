@@ -1,93 +1,58 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L10. 곱셈과 ALU</title>
-<style>
-@font-face{font-family:'Noto Sans KR';src:url('assets/fonts/noto.woff') format('woff');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Nanum Pen';src:url('assets/fonts/nanum.woff') format('woff');font-display:swap}
-
-:root{--ink:#111;--gray:#666;--blue:#1e4f9f}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;background:#fff;color:var(--ink)}
-img.eq{vertical-align:-0.15em}
-.page{max-width:880px;margin:0 auto;background:#fff;position:relative;padding:34px 60px 90px}
-.main{font-size:17px;line-height:1.75}
-.main p{margin:.45em 0}
-.phead{display:flex;justify-content:space-between;align-items:baseline;
-  font-size:14px;color:var(--gray);padding-bottom:8px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
-.phead a{color:var(--gray);text-decoration:none}
-.phead .course{font-weight:700;color:var(--ink)}
-h1.doct{font-size:23px;font-weight:700;margin:6px 0 4px}
-.sub{color:var(--gray);font-size:15px;margin-bottom:8px}
-.sec{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--ink)}
-.sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
-.sec-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
-.sec-label.blue{color:var(--blue)}
-.box{border:1.5px solid #111;padding:12px 18px;margin:10px 0;background:#fff}
-.def{margin:.4em 0;text-align:center}
-.cond{font-size:15px;color:var(--gray)}
-ul.tight li{margin:.3em 0 .3em 1.2em}
-ol.tight li{margin:.3em 0 .3em 1.2em}
-.tt{border-collapse:collapse;margin:10px auto}
-.tt th,.tt td{border:1px solid #111;padding:3px 12px;text-align:center;font-size:15.5px}
-.tt th{font-weight:700}
-.fig{margin:16px 0;text-align:center}
-.fig img{width:100%}
-.fig-cap{font-size:14px;color:var(--gray);margin-top:6px}
-.summary{margin-top:34px;border:1.5px solid #111;padding:10px 16px;font-size:16px}
-.pfoot{margin-top:48px;font-size:14px;border-top:1px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between}
-.pfoot a{color:var(--gray);text-decoration:none}
-.badge{display:inline-block;border:1px solid #111;font-size:13px;padding:1px 8px;margin-left:8px;vertical-align:middle}
-.tlist{margin:6px 0 18px}
-.tlist a{color:var(--ink);text-decoration:none}
-.tlist .row{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid #ddd}
-.tlist .row:last-child{border-bottom:none}
-.tlist .no{flex:0 0 52px;font-weight:700}
-.tlist .ti{flex:1}
-.tlist .kw{color:var(--gray);font-size:14.5px}
-.grp{font-weight:700;font-size:16px;margin:22px 0 4px}
-@media (max-width:760px){
-  .page{padding:22px 18px 60px}
-  .main{font-size:16px}
-  .tlist .kw{display:none}
-}
-@media print{
-  body{background:#fff}
-  .page{max-width:none;padding:10px 24px}
-  .sec{break-inside:avoid-page}
-}
-
-</style>
+<title>L10. 산술 논리 (2) — 곱셈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/study-note.css">
 </head>
 <body>
-<div class="page"><div class="main">
-<div class="phead"><span class="course">EECE274 디지털시스템설계 · 개념 정리본</span><a href="index.html">← 전체 목차</a></div>
-<h1 class="doct">L10. 산술 논리 (2) — 곱셈</h1>
-<p class="sub">Arithmetic Logic Design (2) · 중간고사 범위</p>
-<div class="box"><b>핵심 정리.</b>
+<article class="paper">
+<div class="phead">
+  <a class="to-home" href="index.html">&larr; 목차</a>
+  <span class="phead-c">L10 &middot; 산술 논리 (2) — 곱셈</span>
+  <span class="pmeta phead-r">EECE274 &middot; 디지털시스템설계</span>
+</div>
+
+<h1 class="pagetitle">L10. 산술 논리 (2) — 곱셈</h1>
+<p class="psub">Arithmetic Logic Design (2) · 중간고사 범위</p>
+<div class="body notes">
+
+<div class="bx"><b>핵심 정리.</b>
 array multiplier = 부분곱(AND) + 가산기 2차원 배열 ·
 <b>carry-save addition</b>: carry를 즉시 전파하지 않고 다음 행의 입력으로 넘김 → 여러 수를 더할 때 각 행이 1단 지연, 마지막에 CPA(최종 가산기) 한 번
 </div>
-<div class="sec">
-<div class="sec-label blue">개념 · array multiplier</div>
-<div class="box">n×n 곱셈: 각 부분곱 비트 xᵢyⱼ는 AND 게이트 하나. 이를 가중치대로 정렬해 FA 배열로 누적. 구조가 규칙적이라 배치가 쉽지만 지연은 행 수에 비례.</div>
-</div>
-<div class="sec">
-<div class="sec-label blue">개념 · carry-save addition</div>
+
+<h2><span class="h2no">10.1</span>array multiplier</h2>
+
+
+<div class="bx">n×n 곱셈: 각 부분곱 비트 xᵢyⱼ는 AND 게이트 하나. 이를 가중치대로 정렬해 FA 배열로 누적. 구조가 규칙적이라 배치가 쉽지만 지연은 행 수에 비례.</div>
+
+
+<h2><span class="h2no">10.2</span>carry-save addition</h2>
+
+
 <p>직관: 올림을 옆으로 급하게 넘기지 말고 아래로 모아 두고, 마지막에 한 번만 처리.</p>
-<ul class="tight">
+<ul>
 <li>각 CSA 행: 3개 입력 → (sum, carry) 2개 출력, carry ripple 없음.</li>
 <li>여러 피가산수를 더할수록 이득 — 마지막 행만 carry-propagate adder(CPA)로 마무리.</li>
 </ul>
-</div>
-<div class="sec">
-<div class="sec-label">그림 · array multiplier와 CSA</div>
-<div class="fig"><img src="assets/fig/l10_mult.png" style="max-width:640px" alt=""><div class="fig-cap">Array multiplier(좌)와 4-bit·5-bit CSA를 쌓는 carry-save 덧셈(우)</div></div>
-</div>
-<div class="summary">한 줄 요약: 곱셈 = AND 부분곱 + FA 배열; CSA는 carry 전파를 마지막으로 미뤄 다수 피가산수 덧셈을 빠르게.</div>
 
-</div></div>
+
+<h3>array multiplier와 CSA</h3>
+
+
+<figure><img src="assets/fig/l10_mult.png" style="max-width:640px" alt=""><figcaption>Array multiplier(좌)와 4-bit·5-bit CSA를 쌓는 carry-save 덧셈(우)</figcaption></figure>
+
+
+<div class="takeaway"><b>한 줄 정리</b> &middot; 곱셈 = AND 부분곱 + FA 배열; CSA는 carry 전파를 마지막으로 미뤄 다수 피가산수 덧셈을 빠르게.</div>
+
+<div class="pnav"><a href="l09.html">&larr; L09. 수 체계와 가산기</a><a href="index.html">목차</a><a href="l11.html">L11. 순차 논리 소자 &rarr;</a></div>
+</div>
+</article>
+<script>window.addEventListener('beforeprint',function(){document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','')})});</script>
 </body>
 </html>

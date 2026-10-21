@@ -1,86 +1,48 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>L01. 디지털 시스템 개요</title>
-<style>
-@font-face{font-family:'Noto Sans KR';src:url('assets/fonts/noto.woff') format('woff');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Nanum Pen';src:url('assets/fonts/nanum.woff') format('woff');font-display:swap}
-
-:root{--ink:#111;--gray:#666;--blue:#1e4f9f}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;background:#fff;color:var(--ink)}
-img.eq{vertical-align:-0.15em}
-.page{max-width:880px;margin:0 auto;background:#fff;position:relative;padding:34px 60px 90px}
-.main{font-size:17px;line-height:1.75}
-.main p{margin:.45em 0}
-.phead{display:flex;justify-content:space-between;align-items:baseline;
-  font-size:14px;color:var(--gray);padding-bottom:8px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
-.phead a{color:var(--gray);text-decoration:none}
-.phead .course{font-weight:700;color:var(--ink)}
-h1.doct{font-size:23px;font-weight:700;margin:6px 0 4px}
-.sub{color:var(--gray);font-size:15px;margin-bottom:8px}
-.sec{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--ink)}
-.sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
-.sec-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
-.sec-label.blue{color:var(--blue)}
-.box{border:1.5px solid #111;padding:12px 18px;margin:10px 0;background:#fff}
-.def{margin:.4em 0;text-align:center}
-.cond{font-size:15px;color:var(--gray)}
-ul.tight li{margin:.3em 0 .3em 1.2em}
-ol.tight li{margin:.3em 0 .3em 1.2em}
-.tt{border-collapse:collapse;margin:10px auto}
-.tt th,.tt td{border:1px solid #111;padding:3px 12px;text-align:center;font-size:15.5px}
-.tt th{font-weight:700}
-.fig{margin:16px 0;text-align:center}
-.fig img{width:100%}
-.fig-cap{font-size:14px;color:var(--gray);margin-top:6px}
-.summary{margin-top:34px;border:1.5px solid #111;padding:10px 16px;font-size:16px}
-.pfoot{margin-top:48px;font-size:14px;border-top:1px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between}
-.pfoot a{color:var(--gray);text-decoration:none}
-.badge{display:inline-block;border:1px solid #111;font-size:13px;padding:1px 8px;margin-left:8px;vertical-align:middle}
-.tlist{margin:6px 0 18px}
-.tlist a{color:var(--ink);text-decoration:none}
-.tlist .row{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid #ddd}
-.tlist .row:last-child{border-bottom:none}
-.tlist .no{flex:0 0 52px;font-weight:700}
-.tlist .ti{flex:1}
-.tlist .kw{color:var(--gray);font-size:14.5px}
-.grp{font-weight:700;font-size:16px;margin:22px 0 4px}
-@media (max-width:760px){
-  .page{padding:22px 18px 60px}
-  .main{font-size:16px}
-  .tlist .kw{display:none}
-}
-@media print{
-  body{background:#fff}
-  .page{max-width:none;padding:10px 24px}
-  .sec{break-inside:avoid-page}
-}
-
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/study-note.css">
 </head>
 <body>
-<div class="page"><div class="main">
-<div class="phead"><span class="course">EECE274 디지털시스템설계 · 개념 정리본</span><a href="index.html">← 전체 목차</a></div>
-<h1 class="doct">L01. 디지털 시스템 개요</h1>
-<p class="sub">Introduction · 시험 비중 낮음</p>
-<div class="sec">
-<div class="sec-label blue">개념 · 디지털 시스템</div>
-<p>직관: 연속 신호 대신 0과 1로 계산한다.</p>
-<div class="box">디지털 시스템 = 이진 신호(0/1)를 입력받아 논리 연산으로 출력을 만드는 회로. 아날로그에 비해 잡음에 강하고 설계를 계층적으로 쌓을 수 있다.</div>
+<article class="paper">
+<div class="phead">
+  <a class="to-home" href="index.html">&larr; 목차</a>
+  <span class="phead-c">L01 &middot; 디지털 시스템 개요</span>
+  <span class="pmeta phead-r">EECE274 &middot; 디지털시스템설계</span>
 </div>
-<div class="sec">
-<div class="sec-label blue">개념 · 강의 로드맵</div>
-<ul class="tight">
+
+<h1 class="pagetitle">L01. 디지털 시스템 개요</h1>
+<p class="psub">Introduction · 시험 비중 낮음</p>
+<div class="body notes">
+
+<h2><span class="h2no">1.1</span>디지털 시스템</h2>
+
+
+<p>직관: 연속 신호 대신 0과 1로 계산한다.</p>
+<div class="bx">디지털 시스템 = 이진 신호(0/1)를 입력받아 논리 연산으로 출력을 만드는 회로. 아날로그에 비해 잡음에 강하고 설계를 계층적으로 쌓을 수 있다.</div>
+
+
+<h2><span class="h2no">1.2</span>강의 로드맵</h2>
+
+
+<ul>
 <li><b>조합 논리 (L02–L08)</b>: 출력이 현재 입력만으로 결정. 부울 대수 → K-map → 최소화 → 해저드 → 구현 기술.</li>
 <li><b>산술 논리 (L09–L10)</b>: 수 체계, 가산기(HA/FA/CLA), 감산·곱셈, overflow.</li>
 <li><b>순차 논리 (L11–L12)</b>: 상태를 기억하는 소자(래치, 플립플롭)와 타이밍 제약.</li>
 </ul>
-</div>
-<div class="summary">한 줄 요약: 이 과목 = 조합 논리를 설계·최소화하고, 산술 회로를 만들고, 순차 소자 위에 타이밍 제약을 얹는 과정.</div>
 
-</div></div>
+
+<div class="takeaway"><b>한 줄 정리</b> &middot; 이 과목 = 조합 논리를 설계·최소화하고, 산술 회로를 만들고, 순차 소자 위에 타이밍 제약을 얹는 과정.</div>
+
+<div class="pnav"><span></span><a href="index.html">목차</a><a href="l02.html">L02. 부울 대수 &rarr;</a></div>
+</div>
+</article>
+<script>window.addEventListener('beforeprint',function(){document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','')})});</script>
 </body>
 </html>
