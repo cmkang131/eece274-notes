@@ -316,3 +316,20 @@ a.to-home:hover{color:var(--ink);border-color:var(--ink)}
 .notes table.tt{width:auto;margin:14px auto}
 .sep{border:none;border-top:1px solid #d9d9d9;margin:18px 0}
 .tsub{font-size:14.5px;color:#555;margin:2px 0 8px}
+
+.notes dl.def{margin:14px 0;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
+.notes dl.def>div{display:grid;grid-template-columns:8.5em 1fr;gap:0 18px;padding:9px 2px;border-top:1px solid #e2e2e2}
+.notes dl.def>div:first-child{border-top:none}
+.notes dl.def dt{font-weight:700;font-size:15px;line-height:1.7}
+.notes dl.def dd{margin:0;line-height:1.75}
+.notes p.lead{font-weight:700;font-size:16.5px;line-height:1.7;margin:.5em 0 .9em;padding-left:12px;border-left:3px solid var(--ink)}
+.notes ol.steps{list-style:none;counter-reset:st;padding-left:0;margin:.8em 0}
+.notes ol.steps li{counter-increment:st;position:relative;padding-left:2.4em;margin:.7em 0;line-height:1.75}
+.notes ol.steps li::before{content:counter(st);position:absolute;left:0;top:.2em;width:1.6em;height:1.6em;border:1.3px solid var(--ink);border-radius:50%;text-align:center;font-size:12.5px;font-weight:700;line-height:1.5em}
+@media(max-width:560px){.notes dl.def>div{grid-template-columns:1fr}.notes dl.def dt{margin-bottom:0}}
+
+.notes dl.def.sum>div{grid-template-columns:11em 1fr;padding:7px 2px}
+.notes dl.def.sum dt{font-weight:700;font-size:14.5px}
+.notes dl.def.sum dd{font-size:15px;line-height:1.7}
+.notes .fbox{margin:10px 0}
+@media(max-width:560px){.notes dl.def.sum>div{grid-template-columns:1fr}}
