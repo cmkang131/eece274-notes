@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L06. 다단 논리</title>
+<style>
+@font-face{font-family:'Noto Sans KR';src:url('assets/fonts/noto.woff') format('woff');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Nanum Pen';src:url('assets/fonts/nanum.woff') format('woff');font-display:swap}
+
+:root{--ink:#111;--gray:#666;--blue:#1e4f9f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;background:#fff;color:var(--ink)}
+img.eq{vertical-align:-0.15em}
+.page{max-width:880px;margin:0 auto;background:#fff;position:relative;padding:34px 60px 90px}
+.main{font-size:17px;line-height:1.75}
+.main p{margin:.45em 0}
+.phead{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14px;color:var(--gray);padding-bottom:8px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
+.phead a{color:var(--gray);text-decoration:none}
+.phead .course{font-weight:700;color:var(--ink)}
+h1.doct{font-size:23px;font-weight:700;margin:6px 0 4px}
+.sub{color:var(--gray);font-size:15px;margin-bottom:8px}
+.sec{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--ink)}
+.sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.sec-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.sec-label.blue{color:var(--blue)}
+.box{border:1.5px solid #111;padding:12px 18px;margin:10px 0;background:#fff}
+.def{margin:.4em 0;text-align:center}
+.cond{font-size:15px;color:var(--gray)}
+ul.tight li{margin:.3em 0 .3em 1.2em}
+ol.tight li{margin:.3em 0 .3em 1.2em}
+.tt{border-collapse:collapse;margin:10px auto}
+.tt th,.tt td{border:1px solid #111;padding:3px 12px;text-align:center;font-size:15.5px}
+.tt th{font-weight:700}
+.fig{margin:16px 0;text-align:center}
+.fig img{width:100%}
+.fig-cap{font-size:14px;color:var(--gray);margin-top:6px}
+.summary{margin-top:34px;border:1.5px solid #111;padding:10px 16px;font-size:16px}
+.pfoot{margin-top:48px;font-size:14px;border-top:1px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between}
+.pfoot a{color:var(--gray);text-decoration:none}
+.badge{display:inline-block;border:1px solid #111;font-size:13px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+.tlist{margin:6px 0 18px}
+.tlist a{color:var(--ink);text-decoration:none}
+.tlist .row{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid #ddd}
+.tlist .row:last-child{border-bottom:none}
+.tlist .no{flex:0 0 52px;font-weight:700}
+.tlist .ti{flex:1}
+.tlist .kw{color:var(--gray);font-size:14.5px}
+.grp{font-weight:700;font-size:16px;margin:22px 0 4px}
+@media (max-width:760px){
+  .page{padding:22px 18px 60px}
+  .main{font-size:16px}
+  .tlist .kw{display:none}
+}
+@media print{
+  body{background:#fff}
+  .page{max-width:none;padding:10px 24px}
+  .sec{break-inside:avoid-page}
+}
+
+</style>
+</head>
+<body>
+<div class="page"><div class="main">
+<div class="phead"><span class="course">EECE274 디지털시스템설계 · 개념 정리본</span><a href="index.html">← 전체 목차</a></div>
+<h1 class="doct">L06. 다단 논리 (Multilevel Logic)</h1>
+<p class="sub">Multilevel Logic / Time Response · 중간고사 범위</p>
+<div class="box"><b>핵심 정리.</b> 2단 논리(SoP)는 팬인이 커지고 게이트가 많아진다 → 공통 부분을 뽑아(factoring) <b>다단</b>으로 만들면 게이트·입력 수는 줄지만 <b>지연 단수는 늘어난다</b>. SoP ↔ NAND-NAND, PoS ↔ NOR-NOR는 그대로 치환 가능.</div>
+<div class="sec">
+<div class="sec-label blue">개념 · 왜 다단인가</div>
+<p>직관: F = AB + AC + AD = A(B + C + D) — A를 한 번만 쓴다.</p>
+<ul class="tight">
+<li>2단: 구조가 단순하고 빠르지만, 항이 많으면 AND 게이트 입력 수(팬인)와 게이트 수가 폭증.</li>
+<li>다단: 공통 인수·공통 부분식을 분리해 회로를 작게. 대가는 신호 경로가 길어져 지연 ↑.</li>
+</ul>
+</div>
+<div class="sec">
+<div class="sec-label blue">개념 · NAND/NOR 등가 회로</div>
+<p>드모르간에 의해 같은 함수를 여러 게이트 조합으로 구현 가능:</p>
+<ul class="tight">
+<li><b>SoP → NAND-NAND</b>: AND-OR를 그대로 NAND-NAND로 치환.</li>
+<li><b>PoS → NOR-NOR</b>: OR-AND를 그대로 NOR-NOR로 치환.</li>
+</ul>
+<p class="cond">이유: (AB)′′ = AB처럼 이중 부정이 상쇄되기 때문. NAND·NOR가 범용 게이트라는 사실의 직접적 활용.</p>
+</div>
+<div class="sec">
+<div class="sec-label">그림 · SoP 회로의 등가 변환</div>
+<div class="fig"><img src="assets/fig/l06_net.png" style="max-width:620px" alt=""><div class="fig-cap">F = AB + CD의 AND-OR, NAND-NAND, NOR-OR, OR-NAND 등가 네트워크</div></div>
+</div>
+<div class="summary">한 줄 요약: 다단 = 회로 크기 ↓ / 지연 ↑ 트레이드오프; AND-OR ↔ NAND-NAND 치환 규칙은 암기.</div>
+
+</div></div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EECE274 디지털시스템설계 — 개념 정리본</title>
+<style>
+@font-face{font-family:'Noto Sans KR';src:url('assets/fonts/noto.woff') format('woff');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Nanum Pen';src:url('assets/fonts/nanum.woff') format('woff');font-display:swap}
+
+:root{--ink:#111;--gray:#666;--blue:#1e4f9f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;background:#fff;color:var(--ink)}
+img.eq{vertical-align:-0.15em}
+.page{max-width:880px;margin:0 auto;background:#fff;position:relative;padding:34px 60px 90px}
+.main{font-size:17px;line-height:1.75}
+.main p{margin:.45em 0}
+.phead{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14px;color:var(--gray);padding-bottom:8px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
+.phead a{color:var(--gray);text-decoration:none}
+.phead .course{font-weight:700;color:var(--ink)}
+h1.doct{font-size:23px;font-weight:700;margin:6px 0 4px}
+.sub{color:var(--gray);font-size:15px;margin-bottom:8px}
+.sec{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--ink)}
+.sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.sec-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.sec-label.blue{color:var(--blue)}
+.box{border:1.5px solid #111;padding:12px 18px;margin:10px 0;background:#fff}
+.def{margin:.4em 0;text-align:center}
+.cond{font-size:15px;color:var(--gray)}
+ul.tight li{margin:.3em 0 .3em 1.2em}
+ol.tight li{margin:.3em 0 .3em 1.2em}
+.tt{border-collapse:collapse;margin:10px auto}
+.tt th,.tt td{border:1px solid #111;padding:3px 12px;text-align:center;font-size:15.5px}
+.tt th{font-weight:700}
+.fig{margin:16px 0;text-align:center}
+.fig img{width:100%}
+.fig-cap{font-size:14px;color:var(--gray);margin-top:6px}
+.summary{margin-top:34px;border:1.5px solid #111;padding:10px 16px;font-size:16px}
+.pfoot{margin-top:48px;font-size:14px;border-top:1px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between}
+.pfoot a{color:var(--gray);text-decoration:none}
+.badge{display:inline-block;border:1px solid #111;font-size:13px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+.tlist{margin:6px 0 18px}
+.tlist a{color:var(--ink);text-decoration:none}
+.tlist .row{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid #ddd}
+.tlist .row:last-child{border-bottom:none}
+.tlist .no{flex:0 0 52px;font-weight:700}
+.tlist .ti{flex:1}
+.tlist .kw{color:var(--gray);font-size:14.5px}
+.grp{font-weight:700;font-size:16px;margin:22px 0 4px}
+@media (max-width:760px){
+  .page{padding:22px 18px 60px}
+  .main{font-size:16px}
+  .tlist .kw{display:none}
+}
+@media print{
+  body{background:#fff}
+  .page{max-width:none;padding:10px 24px}
+  .sec{break-inside:avoid-page}
+}
+
+</style>
+</head>
+<body>
+<div class="page"><div class="main">
+<div class="phead"><span class="course">개념 정리본</span><span></span></div>
+<h1 class="doct">EECE274 디지털시스템설계</h1>
+<p class="sub">개념 정리본 · Seokhyeong Kang <span class="badge">중간고사 범위 L02–L12</span></p>
+<div class="box">시험 전날: <a href="cheatsheet.html" style="color:var(--ink)"><b>중간고사 한 장 요약</b></a>만 먼저 보고, 부족한 단원으로 바로 이동.</div>
+<div class="grp">조합 논리</div>
+<div class="tlist">
+<a href="l02.html"><div class="row"><span class="no">L02</span><span class="ti">부울 대수</span><span class="kw">드모르간 · 쌍대성 · 합의 정리</span></div></a>
+<a href="l03.html"><div class="row"><span class="no">L03</span><span class="ti">정준형</span><span class="kw">minterm · SoP/PoS · Σm 표기</span></div></a>
+<a href="l04.html"><div class="row"><span class="no">L04</span><span class="ti">카르노 맵</span><span class="kw">Gray code · 2ⁿ 묶음 · don′t care</span></div></a>
+<a href="l05.html"><div class="row"><span class="no">L05</span><span class="ti">논리 최소화</span><span class="kw">PI · EPI · Q-M</span></div></a>
+<a href="l06.html"><div class="row"><span class="no">L06</span><span class="ti">다단 논리</span><span class="kw">factoring · NAND-NAND</span></div></a>
+<a href="l07.html"><div class="row"><span class="no">L07</span><span class="ti">해저드</span><span class="kw">static/dynamic · hazard-free</span></div></a>
+<a href="l08.html"><div class="row"><span class="no">L08</span><span class="ti">구현 기술</span><span class="kw">mux · LUT · PLA</span></div></a>
+</div>
+<div class="grp">산술 논리</div>
+<div class="tlist">
+<a href="l09.html"><div class="row"><span class="no">L09</span><span class="ti">수 체계와 가산기</span><span class="kw">2의 보수 · overflow · CLA</span></div></a>
+<a href="l10.html"><div class="row"><span class="no">L10</span><span class="ti">곱셈</span><span class="kw">array multiplier · carry-save</span></div></a>
+</div>
+<div class="grp">순차 논리</div>
+<div class="tlist">
+<a href="l11.html"><div class="row"><span class="no">L11</span><span class="ti">순차 논리 소자</span><span class="kw">R-S latch · D latch · 플립플롭</span></div></a>
+<a href="l12.html"><div class="row"><span class="no">L12</span><span class="ti">타이밍</span><span class="kw">setup/hold · skew</span></div></a>
+</div>
+<div class="grp">개요</div>
+<div class="tlist">
+<a href="l01.html"><div class="row"><span class="no">L01</span><span class="ti">디지털 시스템 개요</span><span class="kw">강의 로드맵</span></div></a>
+</div>
+
+</div></div>
+</body>
+</html>
