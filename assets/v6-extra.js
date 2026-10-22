@@ -7,7 +7,7 @@
 if(!window.V6){console.warn("v6-extra: V6 runtime missing");return;}
 var V6=window.V6,INK=V6.INK||"#1a1a1a",RED=V6.RED||"#9e2b25",GRID=V6.GRID||"#e8e6e0",MUTE="#8a8a8a";
 var mine={};
-function reg(name,fn){mine[name]=fn;V6.register(name,fn);}
+function reg(name,fn){var g=function(el,cfg){if(el.__vx)return;el.__vx=1;fn(el,cfg);};mine[name]=g;V6.register(name,g);}
 /* v6.js mounts widgets as soon as it runs (before this deferred file registers), so mount ours here too. */
 function mountMine(){
   var els=document.querySelectorAll(".v6-widget[data-widget]");
