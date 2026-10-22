@@ -108,7 +108,7 @@ a.tap:hover::after{color:var(--ink)}
 
 /* 12. 다크 모드 (invert 방식 유지). 홈 index도 동일 규칙 */
 html[data-theme="dark"]{filter:invert(1) hue-rotate(180deg);background:#ededed}
-html[data-theme="dark"] body,html[data-theme="dark"] .paper{background:#ededed}
+html[data-theme="dark"] body{background:#ededed}
 html[data-theme="dark"] svg,html[data-theme="dark"] figure{background:transparent}
 html[data-theme="dark"] :is(.card,a.tap,.tapc,details.v5d,.dx-body,.concept,.mid-box,.mid-cheat,.problem,.bx,.nb,.fbox,.tblwrap,table,nav.v5-toc,.to-top,.pnav a,.v5-pn a,.stat,.notice,.theme-toggle,.tblwrap.long thead th){background-color:#ededed}
 html[data-theme="dark"] .tblwrap.can-r::after{background:linear-gradient(to right,rgba(237,237,237,0),#ededed)}

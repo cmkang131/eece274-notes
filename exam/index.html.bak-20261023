@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>중간고사 기출 · EECE274</title><style>
+:root{--ink:#1a1a1a;--red:#9e2b25}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.75 "Noto Sans KR",system-ui,sans-serif}
+.paper{max-width:860px;margin:0 auto;padding:24px 28px 80px}
+.phead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:22px;font-size:14px}
+.phead a{color:var(--ink)}
+h1{font-size:26px;margin:.2em 0 .4em}h2{font-size:19px;border-bottom:1px solid var(--ink);padding-bottom:4px;margin:30px 0 10px}
+.problem{border:1.5px solid var(--ink);padding:14px 18px;margin:0 0 18px}
+.prob-no{font-weight:700;font-size:15px;color:var(--red)}.ref{font-size:13px;color:#555;margin-bottom:6px}
+details.dx{border:1px solid var(--ink);margin:10px 0}
+details.dx>summary{cursor:pointer;padding:8px 14px;font-weight:700;list-style:none}
+details.dx>summary::-webkit-details-marker{display:none}
+details.dx[open]>summary{border-bottom:1px solid var(--ink)}
+.dx-body{padding:6px 18px 10px}
+ol.steps{padding-left:22px}ol.steps li{margin:.5em 0}
+.mjx-display{margin:9px 0;overflow-x:auto;padding:7px 14px;border:1px solid var(--ink)}
+.mjx-display svg{display:block;margin:0 auto}
+.mjx svg{display:inline-block;vertical-align:middle;overflow:visible}
+pre.code{border:1px solid var(--ink);padding:10px 14px;overflow-x:auto;font:13.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:#fff;margin:8px 0}
+.sec{margin-top:18px;border-top:1px solid var(--ink);padding-top:8px;font-size:14px}
+.sec a{color:var(--ink)}
+.pnav{display:flex;justify-content:space-between;margin-top:26px;border-top:1.5px solid var(--ink);padding-top:10px;font-size:14px}
+.pnav a{color:var(--ink)}
+table.t{border-collapse:collapse;width:100%;margin:8px 0}table.t td,table.t th{border:1px solid var(--ink);padding:6px 10px;text-align:left;font-size:14.5px}
+b{color:var(--ink)}
+</style>
+<style>table.km{border-collapse:collapse;margin:8px 0;font-size:14px}table.km td,table.km th{border:1px solid #1a1a1a;width:44px;height:36px;text-align:center;padding:0}table.km th{font-weight:700;background:#fff}table.km td small{display:block;font-size:10px;color:#777;line-height:1}table.km td.o{font-weight:700}table.km .km1{color:#9e2b25;font-weight:700}</style></head><body><div class="paper">
+<div class="phead"><a href="../index.html">← 노트 홈</a><span>중간고사 기출</span><span>EECE274 · 디지털시스템설계</span></div><h1>중간고사 기출 (2021–2023)</h1>
+<p>계산으로 풀리는 문제 17개를 정리했다. 회로도·파형을 그리는 문제는 제외했다. 문제 문장은 줄여 쓴 것이다. 풀이는 직접 풀고 코드로 검증했다.</p><table class="t"><tr><th style="width:80px">번호</th><th>문제</th><th style="width:170px">출처</th></tr><tr><td><a href="21-02.html">21-02</a></td><td>정규형: minterm 과 maxterm 표기</td><td>2021 Mid #2</td></tr><tr><td><a href="21-04.html">21-04</a></td><td>K-map 으로 최소 POS</td><td>2021 Mid #4</td></tr><tr><td><a href="21-05.html">21-05</a></td><td>Quine-McCluskey 로 모든 최소 POS</td><td>2021 Mid #5</td></tr><tr><td><a href="21-06.html">21-06</a></td><td>K-map SOP 와 static hazard 제거</td><td>2021 Mid #6 (a)(b)</td></tr><tr><td><a href="21-07.html">21-07</a></td><td>8-to-1 MUX 로 구현 (select = A, C, D)</td><td>2021 Mid #7</td></tr><tr><td><a href="21-08.html">21-08</a></td><td>음수 표현과 2의 보수 덧셈</td><td>2021 Mid #8 · #9</td></tr><tr><td><a href="22-02.html">22-02</a></td><td>5 변수 K-map 최소 SOP</td><td>2022 Mid #2</td></tr><tr><td><a href="22-03.html">22-03</a></td><td>Quine-McCluskey 최소 SOP (don't care 포함)</td><td>2022 Mid #3</td></tr><tr><td><a href="22-05.html">22-05</a></td><td>진법 변환</td><td>2022 Mid #5</td></tr><tr><td><a href="22-06.html">22-06</a></td><td>K-map SOP 와 hazard 판정·제거</td><td>2022 Mid #6</td></tr><tr><td><a href="22-08.html">22-08</a></td><td>full adder 를 MUX 로 구현</td><td>2022 Mid #8</td></tr><tr><td><a href="23-02.html">23-02</a></td><td>Quine-McCluskey 로 최소 POS (don't care 포함)</td><td>2023 Mid #2</td></tr><tr><td><a href="23-03.html">23-03</a></td><td>가산·감산 회로의 합, carry, overflow</td><td>2023 Mid #3</td></tr><tr><td><a href="23-05.html">23-05</a></td><td>K-map 으로 모든 최소 POS</td><td>2023 Mid #5</td></tr><tr><td><a href="23-06a.html">23-06a</a></td><td>8-to-1 MUX 구현 (select = A, C, D)</td><td>2023 Mid #6(a)</td></tr><tr><td><a href="23-06b.html">23-06b</a></td><td>4-to-1 MUX 로 5 변수 함수 구현 (select = A, B)</td><td>2023 Mid #6(b)</td></tr><tr><td><a href="23-10.html">23-10</a></td><td>보수 표현 덧셈과 표 채우기</td><td>2023 Mid #10</td></tr></table></div></body></html>
