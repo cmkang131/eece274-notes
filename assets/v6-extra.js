@@ -1063,7 +1063,7 @@ reg("timing-diagram", function(el, cfg) {
       (inertial
         ? "관성 지연 모델은 지연보다 짧게 지속되는 입력 유도 펄스를 제거합니다."
         : "전달 지연 모델은 각 전이를 설정된 지연만큼 이동시킵니다.") +
-      "</span>";
+      " 시간 격자(DT)를 쓰는 이산 시뮬레이션이라 지연이 DT의 정수배가 아니면 가까운 격자로 반올림됩니다.</span>";
     if (circ.note) h += "<br><span style='color:" + MUTE + "'>" + circ.note + "</span>";
     info.innerHTML = h;
 
@@ -1384,7 +1384,9 @@ function netEval(net, env) {
 }
 
 reg("gate-playground", function(el, cfg) {
+  cfg = cfg || {};
   V6.title(el, cfg.title || "논리 게이트 플레이그라운드");
+
   var expr = cfg.expr || "AB + A'C", cmp = cfg.compare || "";
   var nandMode = cfg.nand === true, env = {};
   var ctl = row(), inRow = row();
@@ -1392,15 +1394,18 @@ reg("gate-playground", function(el, cfg) {
     style: "color:" + RED + ";font-size:12.5px;min-height:1em"
   });
   var box = H("div"), info = noteBox();
+
   el.appendChild(inRow);
   el.appendChild(ctl);
   el.appendChild(err);
   el.appendChild(box);
   el.appendChild(info);
+
   var exprIn = txt(expr, 260, function(v) {
     expr = v;
     render();
   }, "예: AB + A'C");
+
   inRow.appendChild(H("label", {text: "F = "}, [exprIn]));
   inRow.appendChild(H("span", {
     text: "연산자: ' 또는 ! (NOT), * 또는 인접 (AND), ^ (XOR), + (OR)",
@@ -1410,6 +1415,7 @@ reg("gate-playground", function(el, cfg) {
   function render() {
     err.textContent = "";
     var ast, vars;
+
     try {
       ast = parseExpr(expr);
       vars = astVars(ast);
@@ -1419,93 +1425,134 @@ reg("gate-playground", function(el, cfg) {
       return;
     }
 
+    // 현재 식에 없는 변수의 상태를 제거한다.
+    Object.keys(env).forEach(function(v) {
+      if (vars.indexOf(v) < 0) delete env[v];
+    });
+
     vars.forEach(function(v) {
       if (env[v] === undefined) env[v] = 0;
     });
-    var net = buildNet(ast, nandMode), val = netEval(net, env);
+
+    var net = buildNet(ast, nandMode);
+    var val = netEval(net, env);
     var n = vars.length, ROWH = 46, leaves = 0, lvl = [], yy = [];
 
     (function lay(id) {
       var nd = net.nodes[id];
+
       if (!nd.ins.length) {
         yy[id] = leaves * ROWH + 46;
         leaves++;
         lvl[id] = 0;
         return;
       }
+
       var ys = 0, ml = 0;
       nd.ins.forEach(function(c) {
         lay(c);
         ys += yy[c];
         ml = Math.max(ml, lvl[c]);
       });
+
       yy[id] = nd.op === "not" ? yy[nd.ins[0]] : ys / nd.ins.length;
       lvl[id] = ml + 1;
     })(net.root);
 
-    var maxLvl = lvl[net.root], RW = Math.max(n, 1) * 22 + 16;
-    var GX = function(l) { return RW + 30 + (l - 1) * 108; };
+    var maxLvl = Math.max(1, lvl[net.root]);
+    var RW = Math.max(n, 1) * 22 + 16;
+    var GX = function(l) {
+      return RW + 30 + (Math.max(1, l) - 1) * 108;
+    };
     var Wd = Math.max(560, GX(maxLvl) + 48 + 90);
     var Hh = Math.max(1, leaves) * ROWH + 66;
     var svg = svgRoot(Wd, Hh), railX = {};
-    vars.forEach(function(v, i) { railX[v] = 14 + i * 22; });
+
+    vars.forEach(function(v, i) {
+      railX[v] = 14 + i * 22;
+    });
 
     vars.forEach(function(v) {
       var x = railX[v], on = env[v];
       svg.appendChild(S("line", {
         x1: x, y1: 30, x2: x, y2: Hh - 12,
-        stroke: on ? RED : INK, "stroke-width": on ? 2.6 : 1.2
+        stroke: on ? RED : INK,
+        "stroke-width": on ? 2.6 : 1.2
       }));
+
       var g = S("g", {style: "cursor:pointer"});
       g.appendChild(S("rect", {
         x: x - 10, y: 4, width: 20, height: 22, rx: 3,
-        fill: on ? RED : "#fff", stroke: on ? RED : INK, "stroke-width": 1.3
+        fill: on ? RED : "#fff",
+        stroke: on ? RED : INK,
+        "stroke-width": 1.3
       }));
       g.appendChild(S("text", {
         x: x, y: 19, "text-anchor": "middle", "font-size": 12,
         "font-weight": 700, fill: on ? "#fff" : INK, text: v
       }));
-      g.onclick = function() { env[v] = env[v] ? 0 : 1; render(); };
+      g.onclick = function() {
+        env[v] = env[v] ? 0 : 1;
+        render();
+      };
       svg.appendChild(g);
     });
 
-    function wireColor(v) { return v ? RED : INK; }
-    function gh(id) { return Math.max(38, net.nodes[id].ins.length * 16); }
+    function wireColor(v) {
+      return v ? RED : INK;
+    }
+
+    function gh(id) {
+      return Math.max(38, net.nodes[id].ins.length * 16);
+    }
+
     function pinY(id, k) {
       var nd = net.nodes[id], m = nd.ins.length;
       if (nd.op === "not") return yy[id];
       var h = gh(id);
       return yy[id] - h / 2 + h * (k + 0.5) / m;
     }
+
     function poly(pts, v) {
       svg.appendChild(S("polyline", {
-        points: pts.map(function(p) { return p[0] + "," + p[1]; }).join(" "),
-        fill: "none", stroke: wireColor(v),
-        "stroke-width": v ? 2.6 : 1.3, "stroke-linejoin": "round"
+        points: pts.map(function(p) {
+          return p[0] + "," + p[1];
+        }).join(" "),
+        fill: "none",
+        stroke: wireColor(v),
+        "stroke-width": v ? 2.6 : 1.3,
+        "stroke-linejoin": "round"
       }));
     }
 
     net.nodes.forEach(function(nd, id) {
       nd.ins.forEach(function(c, k) {
-        var cn = net.nodes[c], xin = GX(lvl[id]), py = pinY(id, k);
+        var cn = net.nodes[c];
+        var xin = GX(lvl[id]), py = pinY(id, k);
         var vv = val[c];
+
         if (!cn.ins.length) {
           var x0 = cn.op === "leaf" ? railX[cn.v] : RW + 2;
           var y0 = yy[c];
+
           if (cn.op === "const") {
             svg.appendChild(S("text", {
               x: RW - 2, y: y0 + 4, "text-anchor": "end",
-              "font-size": 12, "font-weight": 700, fill: INK, text: String(cn.v)
+              "font-size": 12, "font-weight": 700,
+              fill: INK, text: String(cn.v)
             }));
           } else {
             svg.appendChild(S("circle", {
               cx: x0, cy: y0, r: 3.2, fill: wireColor(vv)
             }));
           }
+
           var xm = xin - 14 - 6 * (k % 3);
           poly([[x0, y0], [xm, y0], [xm, py], [xin, py]], vv);
         } else {
-          var xo = GX(lvl[c]) + 52, yo = yy[c], xm2 = xin - 14 - 6 * (k % 3);
+          var xo = GX(lvl[c]) + 52;
+          var yo = yy[c];
+          var xm2 = xin - 14 - 6 * (k % 3);
           poly([[xo, yo], [xm2, yo], [xm2, py], [xin, py]], vv);
         }
       });
@@ -1513,69 +1560,121 @@ reg("gate-playground", function(el, cfg) {
 
     net.nodes.forEach(function(nd, id) {
       if (!nd.ins.length) return;
-      var x = GX(lvl[id]), y = yy[id], h = gh(id), w = 52, out = val[id];
-      var op = nd.op, bw = (op === "nand" || op === "nor" || op === "not") ? w - 8 : w;
+
+      var x = GX(lvl[id]), y = yy[id], h = gh(id), w = 52;
+      var out = val[id], op = nd.op;
+      var bw = (op === "nand" || op === "nor" || op === "not")
+        ? w - 8 : w;
       var common = {fill: "#fff", stroke: INK, "stroke-width": 1.6};
       var shape;
+
       if (op === "and" || op === "nand") {
         shape = S("path", Object.assign({
-          d: "M" + x + " " + (y-h/2) + " L" + (x+bw*.5) + " " + (y-h/2) +
-             " A" + (bw*.5) + " " + (h/2) + " 0 0 1 " + (x+bw*.5) + " " + (y+h/2) +
+          d: "M" + x + " " + (y-h/2) +
+             " L" + (x+bw*.5) + " " + (y-h/2) +
+             " A" + (bw*.5) + " " + (h/2) + " 0 0 1 " +
+             (x+bw*.5) + " " + (y+h/2) +
              " L" + x + " " + (y+h/2) + " Z"
         }, common));
       } else if (op === "or" || op === "nor" || op === "xor") {
         shape = S("path", Object.assign({
-          d: "M" + x + " " + (y-h/2) + " Q" + (x+bw*.65) + " " + (y-h/2) +
-             " " + (x+bw) + " " + y + " Q" + (x+bw*.65) + " " + (y+h/2) +
-             " " + x + " " + (y+h/2) + " Q" + (x+bw*.3) + " " + y +
+          d: "M" + x + " " + (y-h/2) +
+             " Q" + (x+bw*.65) + " " + (y-h/2) +
+             " " + (x+bw) + " " + y +
+             " Q" + (x+bw*.65) + " " + (y+h/2) +
+             " " + x + " " + (y+h/2) +
+             " Q" + (x+bw*.3) + " " + y +
              " " + x + " " + (y-h/2) + " Z"
         }, common));
       } else {
         shape = S("path", Object.assign({
-          d: "M" + x + " " + (y-13) + " L" + (x+bw) + " " + y +
+          d: "M" + x + " " + (y-13) +
+             " L" + (x+bw) + " " + y +
              " L" + x + " " + (y+13) + " Z"
         }, common));
       }
+
       svg.appendChild(shape);
+
       if (op === "nand" || op === "nor" || op === "not") {
         svg.appendChild(S("circle", {
-          cx: x + w - 4, cy: y, r: 4, fill: "#fff",
-          stroke: INK, "stroke-width": 1.6
+          cx: x + w - 4, cy: y, r: 4,
+          fill: "#fff", stroke: INK, "stroke-width": 1.6
         }));
       }
+
       if (op === "xor") {
         svg.appendChild(S("path", {
-          d: "M" + (x-7) + " " + (y-h/2) + " Q" + (x-7+bw*.3) +
-             " " + y + " " + (x-7) + " " + (y+h/2),
+          d: "M" + (x-7) + " " + (y-h/2) +
+             " Q" + (x-7+bw*.3) + " " + y +
+             " " + (x-7) + " " + (y+h/2),
           fill: "none", stroke: INK, "stroke-width": 1.6
         }));
       }
-      var lbl = {and: "AND", or: "OR", nand: "NAND", nor: "NOR",
-                 xor: "XOR", not: ""}[op];
-      if (lbl) svg.appendChild(S("text", {
-        x: x + bw * .46, y: y + 3.5, "text-anchor": "middle",
-        "font-size": 9.5, fill: INK, text: lbl
-      }));
+
+      var lbl = {
+        and: "AND", or: "OR", nand: "NAND", nor: "NOR",
+        xor: "XOR", not: ""
+      }[op];
+
+      if (lbl) {
+        svg.appendChild(S("text", {
+          x: x + bw*.46, y: y + 3.5,
+          "text-anchor": "middle", "font-size": 9.5,
+          fill: INK, text: lbl
+        }));
+      }
+
       svg.appendChild(S("text", {
-        x: x + w + 4, y: y - 6, "font-size": 10, "font-weight": 700,
+        x: x + w + 4, y: y - 6,
+        "font-size": 10, "font-weight": 700,
         fill: out ? RED : INK, text: String(out)
       }));
     });
 
-    var ro = net.root, xr = GX(lvl[ro]) + 52, yr = yy[ro], ov = val[ro];
+    // 루트가 게이트가 아닌 리프(상수 또는 변수)인 경우도
+    // 음수 X 좌표를 사용하지 않고 해당 리프에서 출력선을 시작한다.
+    var ro = net.root, rootNode = net.nodes[ro];
+    var yr = yy[ro], ov = val[ro], xr;
+
+    if (!rootNode.ins.length) {
+      var rootX = rootNode.op === "leaf"
+        ? railX[rootNode.v]
+        : RW + 2;
+
+      if (rootNode.op === "const") {
+        svg.appendChild(S("text", {
+          x: RW - 2, y: yr + 4, "text-anchor": "end",
+          "font-size": 12, "font-weight": 700,
+          fill: INK, text: String(rootNode.v)
+        }));
+      } else {
+        svg.appendChild(S("circle", {
+          cx: rootX, cy: yr, r: 3.2, fill: wireColor(ov)
+        }));
+      }
+
+      xr = rootX;
+    } else {
+      xr = GX(lvl[ro]) + 52;
+    }
+
     poly([[xr, yr], [xr + 36, yr]], ov);
     svg.appendChild(S("circle", {
-      cx: xr + 46, cy: yr, r: 10, fill: ov ? RED : "#fff",
+      cx: xr + 46, cy: yr, r: 10,
+      fill: ov ? RED : "#fff",
       stroke: ov ? RED : INK, "stroke-width": 1.5
     }));
     svg.appendChild(S("text", {
-      x: xr + 46, y: yr + 4, "text-anchor": "middle", "font-size": 12,
-      "font-weight": 700, fill: ov ? "#fff" : INK, text: String(ov)
+      x: xr + 46, y: yr + 4, "text-anchor": "middle",
+      "font-size": 12, "font-weight": 700,
+      fill: ov ? "#fff" : INK, text: String(ov)
     }));
     svg.appendChild(S("text", {
       x: xr + 62, y: yr + 4, "font-size": 13,
       "font-weight": 700, fill: INK, text: "F"
     }));
+
     box.innerHTML = "";
     box.appendChild(svg);
 
@@ -1583,6 +1682,7 @@ reg("gate-playground", function(el, cfg) {
     net.nodes.forEach(function(nd) {
       if (nd.ins.length) gc[nd.op] = (gc[nd.op] || 0) + 1;
     });
+
     var gcs = Object.keys(gc).map(function(k) {
       return k.toUpperCase() + " " + gc[k];
     }).join(", ") || "게이트 없음";
@@ -1591,76 +1691,122 @@ reg("gate-playground", function(el, cfg) {
     vars.forEach(function(v, j) {
       cur |= (env[v] ? 1 : 0) << (n - 1 - j);
     });
+
     var ones = [];
-    tt.forEach(function(x, i) { if (x) ones.push(i); });
+    tt.forEach(function(x, i) {
+      if (x) ones.push(i);
+    });
+
     var res = minimize(n, ones, []);
     var greedy = false;
+
     if (ones.length) {
       var ess = {};
       ones.forEach(function(o) {
         var c = res.pis.map(function(p, i) {
           return covers(p, o) ? i : -1;
-        }).filter(function(i) { return i >= 0; });
+        }).filter(function(i) {
+          return i >= 0;
+        });
         if (c.length === 1) ess[c[0]] = true;
       });
+
       var remaining = ones.filter(function(o) {
         return !Object.keys(ess).some(function(i) {
           return covers(res.pis[+i], o);
         });
       });
+
       var cand = res.pis.map(function(p, i) {
-        return !ess[i] && remaining.some(function(o) { return covers(p, o); }) ? i : -1;
-      }).filter(function(i) { return i >= 0; });
+        return !ess[i] &&
+          remaining.some(function(o) { return covers(p, o); })
+          ? i : -1;
+      }).filter(function(i) {
+        return i >= 0;
+      });
+
       greedy = remaining.length > 0 && cand.length > 18;
     }
+
     var min = ones.length === 0 ? "0" :
-      (ones.length === tt.length ? "1" : exprFromCover(res, n, vars, false));
+      (ones.length === tt.length ? "1" :
+        exprFromCover(res, n, vars, false));
+
     var minLabel = greedy
       ? "간단화(최소 보장 안 됨)"
       : "진리표 기준 최소 SOP";
 
     var h = "<div style='display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start'>";
-    h += "<table><tr>" + vars.map(function(v) { return "<th>" + v + "</th>"; }).join("") + "<th>F</th></tr>";
+    h += "<table><tr>" +
+      vars.map(function(v) { return "<th>" + v + "</th>"; }).join("") +
+      "<th>F</th></tr>";
+
     tt.forEach(function(x, i) {
       h += "<tr data-r='" + i + "' style='cursor:pointer" +
-        (i === cur ? ";outline:2px solid " + RED + ";outline-offset:-2px" : "") + "'>" +
+        (i === cur
+          ? ";outline:2px solid " + RED + ";outline-offset:-2px"
+          : "") + "'>" +
         vars.map(function(v, j) {
           return "<td>" + ((i >> (n-1-j)) & 1) + "</td>";
-        }).join("") + "<td style='font-weight:700;" +
+        }).join("") +
+        "<td style='font-weight:700;" +
         (x ? "color:" + RED : "") + "'>" + x + "</td></tr>";
     });
+
     h += "</table><div style='flex:1;min-width:240px'>";
     h += "게이트: " + gcs + (nandMode ? " (NAND만 사용)" : "") + "<br>";
-    h += "입력 " + vars.map(function(v) { return v + "=" + env[v]; }).join(", ") +
-      " → F = <b style='color:" + RED + "'>" + ov + "</b><br>";
+    h += "입력 " + vars.map(function(v) {
+      return v + "=" + env[v];
+    }).join(", ") + " → F = <b style='color:" + RED + "'>" +
+      ov + "</b><br>";
     h += minLabel + ": <b style='color:" + RED + "'>" + min + "</b>";
     h += "<br><span style='color:" + INK + "'>F = Σm(" +
       (ones.join(",") || "없음") + ")</span>";
     h += "<div id='cmpbox' style='margin-top:10px'></div></div></div>";
+
     info.innerHTML = h;
+
     info.querySelectorAll("tr[data-r]").forEach(function(tr) {
       tr.onclick = function() {
         var i = +tr.getAttribute("data-r");
-        vars.forEach(function(v, j) { env[v] = (i >> (n-1-j)) & 1; });
+        vars.forEach(function(v, j) {
+          env[v] = (i >> (n-1-j)) & 1;
+        });
         render();
       };
     });
 
     var cb = info.querySelector("#cmpbox");
     cb.removeAttribute("id");
-    var cin = txt(cmp, 200, function(v) { cmp = v; updateCmp(); }, "비교할 식");
+    var cin = txt(cmp, 200, function(v) {
+      cmp = v;
+      updateCmp();
+    }, "비교할 식");
     var cres = H("div", {style: "margin-top:4px"});
+
     cb.appendChild(H("label", {text: "비교 식 G = "}, [cin]));
     cb.appendChild(cres);
+
     function updateCmp() {
-      if (!cmp.trim()) { cres.textContent = ""; return; }
+      if (!cmp.trim()) {
+        cres.textContent = "";
+        return;
+      }
+
       try {
         var a2 = parseExpr(cmp), v2 = astVars(a2);
-        if (v2.length > 5) throw new Error("비교식 변수는 최대 5개까지");
+        if (v2.length > 5) {
+          throw new Error("비교식 변수는 최대 5개까지");
+        }
+
         var all = vars.concat(v2.filter(function(x) {
           return vars.indexOf(x) < 0;
         })).sort();
-        if (all.length > 5) throw new Error("두 식을 합쳐 최대 5개 변수까지 비교할 수 있습니다.");
+
+        if (all.length > 5) {
+          throw new Error("두 식을 합쳐 최대 5개 변수까지 비교할 수 있습니다.");
+        }
+
         var bad = null;
         for (var i = 0; i < (1 << all.length) && bad === null; i++) {
           var e2 = {};
@@ -1669,34 +1815,56 @@ reg("gate-playground", function(el, cfg) {
           });
           if (astEval(ast, e2) !== astEval(a2, e2)) bad = e2;
         }
-        if (bad === null) cres.innerHTML = "<b>동치</b>: 모든 입력에서 F = G.";
-        else cres.innerHTML = "<b style='color:" + RED + "'>다름</b>: " +
-          all.map(function(v) { return v + "=" + bad[v]; }).join(", ") +
-          " 에서 F=" + astEval(ast, bad) + ", G=" + astEval(a2, bad);
+
+        if (bad === null) {
+          cres.innerHTML = "<b>동치</b>: 모든 입력에서 F = G.";
+        } else {
+          cres.innerHTML = "<b style='color:" + RED + "'>다름</b>: " +
+            all.map(function(v) { return v + "=" + bad[v]; }).join(", ") +
+            " 에서 F=" + astEval(ast, bad) +
+            ", G=" + astEval(a2, bad);
+        }
       } catch (e) {
         cres.textContent = "식 오류: " + e.message;
       }
     }
+
     updateCmp();
 
     ctl.innerHTML = "";
-    var b1 = btn("AND / OR / NOT", function() { nandMode = false; render(); });
-    var b2 = btn("NAND만 사용", function() { nandMode = true; render(); });
-    (nandMode ? b2 : b1).style.cssText += "background:" + INK + ";color:#fff";
+    var b1 = btn("AND / OR / NOT", function() {
+      nandMode = false;
+      render();
+    });
+    var b2 = btn("NAND만 사용", function() {
+      nandMode = true;
+      render();
+    });
+
+    (nandMode ? b2 : b1).style.cssText +=
+      "background:" + INK + ";color:#fff";
     ctl.appendChild(b1);
     ctl.appendChild(b2);
+
     ctl.appendChild(btn("입력 모두 0", function() {
       vars.forEach(function(v) { env[v] = 0; });
       render();
     }));
+
     ctl.appendChild(btn("다음 진리표 행", function() {
       var i = (cur + 1) % (1 << n);
-      vars.forEach(function(v, j) { env[v] = (i >> (n-1-j)) & 1; });
+      vars.forEach(function(v, j) {
+        env[v] = (i >> (n-1-j)) & 1;
+      });
       render();
     }));
+
     if (cfg.presets && cfg.presets.length) {
       var po = [["", "예제 식"]];
-      cfg.presets.forEach(function(p, i) { po.push([i, p]); });
+      cfg.presets.forEach(function(p, i) {
+        po.push([i, p]);
+      });
+
       ctl.appendChild(sel(po, "", function(x) {
         if (x === "") return;
         expr = cfg.presets[+x];
@@ -1705,10 +1873,15 @@ reg("gate-playground", function(el, cfg) {
         render();
       }));
     }
-    if (cfg.note) info.appendChild(H("div", {
-      html: cfg.note, style: "margin-top:8px;color:" + INK
-    }));
+
+    if (cfg.note) {
+      info.appendChild(H("div", {
+        html: cfg.note,
+        style: "margin-top:8px;color:" + INK
+      }));
+    }
   }
+
   render();
 });
 
@@ -1720,95 +1893,133 @@ function minus(x){return x<0?"\u2212"+(-x):String(x);}
 reg("twos-complement", function(el, cfg) {
   V6.title(el, cfg.title || "2의 보수 변환기");
   cfg = cfg || {};
+
   var allowed = [3, 4, 5, 6, 8, 12, 16];
   var n = Number(cfg.bits || 4);
   if (allowed.indexOf(n) < 0) n = 4;
+
   var requested = Number(cfg.value === undefined ? -3 : cfg.value);
   if (!Number.isFinite(requested)) requested = -3;
   requested = Math.trunc(requested);
+
   var lim = Math.pow(2, n-1);
   var u = fromSigned(Math.max(-lim, Math.min(lim-1, requested)), n);
   var warning = requested < -lim || requested >= lim
-    ? "초기값이 " + n + "비트 범위를 벗어나 " + rangeStr(n) + "로 조정됨."
+    ? "초기값이 " + n + "비트 범위를 벗어나 " +
+      rangeStr(n) + "로 조정됨."
     : "";
+
   var ctl = row(), box = H("div"), info = noteBox();
   el.appendChild(ctl);
   el.appendChild(box);
   el.appendChild(info);
+
   var decStr = null;
 
   function render() {
     var mod = Math.pow(2, n), mask = mod-1, half = mod/2;
     u &= mask;
-    var s2 = sgn(u, n), sign = u >= half ? 1 : 0, mag = u % half;
+
+    var s2 = sgn(u, n);
+    var sign = u >= half ? 1 : 0;
+    var mag = u % half;
     var sm = sign ? -mag : mag;
     var o1 = sign ? -((~u)&mask) : u;
+
     var smStr = sign && mag === 0 ? "−0" : minus(sm);
     var o1Str = sign && ((~u)&mask) === 0 ? "−0" : minus(o1);
+
     var svg = svgRoot(Math.max(420, n*52+40), 150);
     var cw = Math.min(52, Math.floor(660/n)), x0 = 20;
 
     for (var i = 0; i < n; i++) {
-      var bit = (u >>> (n-1-i)) & 1, x = x0+i*cw;
-      var weight = i === 0 ? -Math.pow(2, n-1) : Math.pow(2, n-1-i);
+      var bit = (u >>> (n-1-i)) & 1;
+      var x = x0+i*cw;
+      var weight = i === 0 ? -Math.pow(2, n-1) :
+        Math.pow(2, n-1-i);
+
       var g = S("g", {style: "cursor:pointer"});
       g.appendChild(S("rect", {
         x: x, y: 34, width: cw-4, height: 44,
-        fill: bit ? INK : "#fff", stroke: i === 0 ? RED : INK,
+        fill: bit ? INK : "#fff",
+        stroke: i === 0 ? RED : INK,
         "stroke-width": i === 0 ? 2.4 : 1.4
       }));
+
       g.appendChild(S("text", {
         x: x+(cw-4)/2, y: 64, "text-anchor": "middle",
         "font-size": 24, "font-weight": 700,
         fill: bit ? "#fff" : INK, text: String(bit)
       }));
+
       (function(i) {
         g.onclick = function() {
           u = (u ^ (1 << (n-1-i))) & mask;
           decStr = null;
+
+          // 직접 편집한 비트 패턴에는 과거 범위 경고를 적용하지 않는다.
+          warning = "";
+
           render();
         };
       })(i);
+
       svg.appendChild(g);
+
       svg.appendChild(S("text", {
         x: x+(cw-4)/2, y: 26, "text-anchor": "middle",
         "font-size": 11, fill: i === 0 ? RED : INK,
         "font-weight": i === 0 ? 700 : 400,
-        text: i === 0 ? "−" + Math.pow(2,n-1) : String(Math.pow(2,n-1-i))
+        text: i === 0 ? "−" + Math.pow(2,n-1) :
+          String(Math.pow(2,n-1-i))
       }));
+
       svg.appendChild(S("text", {
         x: x+(cw-4)/2, y: 98, "text-anchor": "middle",
         "font-size": 12, fill: bit ? (i === 0 ? RED : INK) : INK,
         text: bit ? (i === 0 ? "−" + Math.pow(2,n-1) : "+"+weight) : "0"
       }));
     }
+
     svg.appendChild(S("text", {
       x: x0, y: 9, "font-size": 11, fill: INK,
-      text: "부호 비트는 가중치 −" + Math.pow(2,n-1) + ". 비트를 클릭해 변경."
+      text: "부호 비트는 가중치 −" + Math.pow(2,n-1) +
+        ". 비트를 클릭해 변경."
     }));
+
     var terms = [];
     for (var j = 0; j < n; j++) {
       var b = (u >>> (n-1-j)) & 1;
-      if (b) terms.push(j === 0 ? "(−"+Math.pow(2,n-1)+")" :
-        String(Math.pow(2,n-1-j)));
+      if (b) {
+        terms.push(j === 0 ? "(−"+Math.pow(2,n-1)+")" :
+          String(Math.pow(2,n-1-j)));
+      }
     }
+
     svg.appendChild(S("text", {
       x: x0, y: 128, "font-size": 13, fill: INK,
-      text: "합 = " + (terms.length ? terms.join(" + ") : "0") + " = " + minus(s2)
+      text: "합 = " + (terms.length ? terms.join(" + ") : "0") +
+        " = " + minus(s2)
     }));
+
     box.innerHTML = "";
     box.appendChild(svg);
 
-    var h = "<table><tr><th>해석</th><th>값</th><th>표현 범위 ("+n+"비트)</th></tr>" +
+    var h = "<table><tr><th>해석</th><th>값</th><th>표현 범위 ("+
+      n+"비트)</th></tr>" +
       "<tr><td>unsigned</td><td>"+u+"</td><td>0 ~ "+(mod-1)+"</td></tr>" +
-      "<tr><td>sign-magnitude</td><td>"+smStr+"</td><td>"+(-(half-1))+" ~ "+(half-1)+" (0이 두 개)</td></tr>" +
-      "<tr><td>1의 보수</td><td>"+o1Str+"</td><td>"+(-(half-1))+" ~ "+(half-1)+" (0이 두 개)</td></tr>" +
-      "<tr><td><b>2의 보수</b></td><td><b style='color:"+RED+"'>"+minus(s2)+"</b></td><td>"+rangeStr(n)+" (0이 하나)</td></tr></table>";
+      "<tr><td>sign-magnitude</td><td>"+smStr+"</td><td>"+
+      (-(half-1))+" ~ "+(half-1)+" (0이 두 개)</td></tr>" +
+      "<tr><td>1의 보수</td><td>"+o1Str+"</td><td>"+
+      (-(half-1))+" ~ "+(half-1)+" (0이 두 개)</td></tr>" +
+      "<tr><td><b>2의 보수</b></td><td><b style='color:"+RED+"'>"+
+      minus(s2)+"</b></td><td>"+rangeStr(n)+" (0이 하나)</td></tr></table>";
 
     var inv = (~u)&mask, neg = (inv+1)&mask;
     h += "<div style='margin-top:8px'><b>부호 바꾸기</b> (−x = x̄ + 1): " +
       bin(u,n) + " → 비트 반전 " + bin(inv,n) + " → +1 → <b style='color:" +
       RED + "'>" + bin(neg,n) + "</b> = " + minus(sgn(neg,n));
+
     if (u === half) {
       h += "<br><span style='color:"+RED+"'>−"+half+
         "는 최솟값이다. 부정해도 같은 비트 패턴이며 +"+half+
@@ -1816,10 +2027,16 @@ reg("twos-complement", function(el, cfg) {
     } else if (u === 0) {
       h += "<br>0의 부정은 0이다. carry-out은 버린다.";
     }
-    h += "</div><div style='margin-top:4px'><b>부호 확장</b> ("+n+"→"+(n+4)+
-      "비트): 부호 비트 "+sign+"을 앞에 4개 복제 → "+
-      String(sign).repeat(4)+bin(u,n)+" (값 "+minus(s2)+" 유지)</div>";
-    if (warning) h += "<div style='margin-top:6px;color:"+RED+"'>"+warning+"</div>";
+
+    h += "</div><div style='margin-top:4px'><b>부호 확장</b> ("+
+      n+"→"+(n+4)+"비트): 부호 비트 "+sign+
+      "을 앞에 4개 복제 → "+String(sign).repeat(4)+bin(u,n)+
+      " (값 "+minus(s2)+" 유지)</div>";
+
+    if (warning) {
+      h += "<div style='margin-top:6px;color:"+RED+"'>"+
+        warning+"</div>";
+    }
     info.innerHTML = h;
 
     ctl.innerHTML = "";
@@ -1828,40 +2045,60 @@ reg("twos-complement", function(el, cfg) {
       function(x) {
         var oldValue = sgn(u, n);
         n = +x;
-        var lim2 = Math.pow(2, n-1), adjusted = Math.max(-lim2, Math.min(lim2-1, oldValue));
-        if (adjusted !== oldValue) warning = "값이 " + n + "비트 범위로 조정됨: " +
-          minus(oldValue) + " → " + minus(adjusted) + ".";
-        else warning = "";
+
+        var lim2 = Math.pow(2, n-1);
+        var adjusted = Math.max(-lim2, Math.min(lim2-1, oldValue));
+
+        if (adjusted !== oldValue) {
+          warning = "값이 " + n + "비트 범위로 조정됨: " +
+            minus(oldValue) + " → " + minus(adjusted) + ".";
+        } else {
+          warning = "";
+        }
+
         u = fromSigned(adjusted, n);
         decStr = null;
         render();
       }
     )]));
+
     var inp = txt(decStr !== null ? decStr : String(s2), 70, function(v) {
       decStr = v;
       var x = Number(v);
-      if (v.trim() === "" || !/^[+-]?\d+$/.test(v.trim()) || !Number.isSafeInteger(x)) {
+
+      if (v.trim() === "" ||
+          !/^[+-]?\d+$/.test(v.trim()) ||
+          !Number.isSafeInteger(x)) {
         msg.textContent = "유효한 정수를 입력하세요.";
         return;
       }
+
       if (x < -half || x >= half) {
-        msg.textContent = x + "은(는) " + n + "비트 범위 (" + rangeStr(n) + ") 밖입니다.";
+        msg.textContent = x + "은(는) " + n +
+          "비트 범위 (" + rangeStr(n) + ") 밖입니다.";
         return;
       }
+
       u = fromSigned(x, n);
       warning = "";
       msg.textContent = "";
       render();
     }, "-3");
-    var msg = H("span", {style: "color:"+RED+";font-size:12.5px"});
+
+    var msg = H("span", {
+      style: "color:"+RED+";font-size:12.5px"
+    });
+
     ctl.appendChild(H("label", {text: "10진 입력 "}, [inp]));
     ctl.appendChild(msg);
+
     ctl.appendChild(btn("부호 바꾸기 (−x)", function() {
       u = (~u + 1) & mask;
       decStr = null;
       warning = "";
       render();
     }));
+
     ctl.appendChild(btn("+1", function() {
       u = (u+1)&mask;
       decStr = null;
@@ -1869,6 +2106,7 @@ reg("twos-complement", function(el, cfg) {
       render();
     }));
   }
+
   render();
 });
 
@@ -1876,167 +2114,277 @@ reg("twos-complement", function(el, cfg) {
 reg("twos-adder", function(el, cfg) {
   V6.title(el, cfg.title || "2의 보수 덧셈·뺄셈과 overflow");
   cfg = cfg || {};
+
   var allowed = [3, 4, 5, 6, 8];
   var n = Number(cfg.bits || 4);
   if (allowed.indexOf(n) < 0) n = 4;
-  function validInt(x) { return Number.isFinite(x) && Number.isInteger(x); }
+
+  function validInt(x) {
+    return Number.isFinite(x) && Number.isInteger(x);
+  }
+
   var a0 = cfg.a === undefined ? 5 : Number(cfg.a);
   var b0 = cfg.b === undefined ? 3 : Number(cfg.b);
   if (!validInt(a0)) a0 = 5;
   if (!validInt(b0)) b0 = 3;
+
   function clamp(v) {
     var lim = Math.pow(2, n-1);
     return Math.max(-lim, Math.min(lim-1, v));
   }
+
   var a = clamp(a0), b = clamp(b0);
   var warning = (a !== a0 || b !== b0)
     ? "초기값이 " + n + "비트 범위로 조정됨: A=" + minus(a0) +
       " → " + minus(a) + ", B=" + minus(b0) + " → " + minus(b) + "."
     : "";
+
   var op = cfg.op === "sub" ? "sub" : "add";
   var ctl = row(), box = H("div"), info = noteBox();
+  var inputError = "";
+
   el.appendChild(ctl);
   el.appendChild(box);
   el.appendChild(info);
 
   function render() {
-    var oldA = a, oldB = b;
-    a = clamp(a);
-    b = clamp(b);
     var mod = Math.pow(2,n), mask = mod-1;
     var A = fromSigned(a,n), B0 = fromSigned(b,n);
-    var B = op === "sub" ? ((~B0)&mask) : B0, cin = op === "sub" ? 1 : 0;
+    var B = op === "sub" ? ((~B0)&mask) : B0;
+    var cin = op === "sub" ? 1 : 0;
     var c = [cin], sum = [];
+
     for (var i = 0; i < n; i++) {
-      var ai = (A >>> i)&1, bi = (B >>> i)&1, ci = c[i];
+      var ai = (A >>> i)&1;
+      var bi = (B >>> i)&1;
+      var ci = c[i];
       sum[i] = ai ^ bi ^ ci;
       c[i+1] = (ai&bi) | (ai&ci) | (bi&ci);
     }
+
     var S2 = 0;
     for (var k = 0; k < n; k++) S2 |= sum[k] << k;
+
     var res = sgn(S2,n), truth = op === "add" ? a+b : a-b;
     var lim = Math.pow(2,n-1);
     var ovf = (c[n] ^ c[n-1]) === 1;
-    var range = truth < -lim || truth >= lim;
     var cw = Math.min(54, Math.floor(560/(n+2)));
     var x0 = 110, Wd = x0+(n+1)*cw+130, Hh = 196;
     var svg = svgRoot(Math.max(Wd,460),Hh);
-    function colX(i) { return x0+(n-i)*cw+cw/2; }
+
+    function colX(i) {
+      return x0+(n-i)*cw+cw/2;
+    }
+
     function cell(i,y,t,color,bold) {
       svg.appendChild(S("text", {
-        x: colX(i), y: y, "text-anchor": "middle", "font-size": 19,
-        "font-weight": bold ? 700 : 400, fill: color || INK, text: String(t)
+        x: colX(i), y: y, "text-anchor": "middle",
+        "font-size": 19, "font-weight": bold ? 700 : 400,
+        fill: color || INK, text: String(t)
       }));
     }
+
     function lab(y,t,color) {
       svg.appendChild(S("text", {
-        x: x0-8, y: y, "text-anchor": "end", "font-size": 12,
-        fill: color || INK, "font-weight": 700, text: t
+        x: x0-8, y: y, "text-anchor": "end",
+        "font-size": 12, fill: color || INK,
+        "font-weight": 700, text: t
       }));
     }
+
     for (var q = 0; q < n; q++) {
       svg.appendChild(S("text", {
         x: colX(q), y: 14, "text-anchor": "middle",
         "font-size": 10, fill: INK, text: "bit " + q
       }));
     }
+
     lab(44,"carry C");
     for (var i3 = 0; i3 <= n; i3++) {
       var hot = ovf && (i3 === n || i3 === n-1);
       cell(i3,44,c[i3],hot ? RED : INK,hot);
-      if (hot) svg.appendChild(S("text", {
-        x: colX(i3), y: 58, "text-anchor": "middle",
-        "font-size": 9, fill: RED, text: i3 === n ? "C_n" : "C_(n−1)"
-      }));
+
+      if (hot) {
+        svg.appendChild(S("text", {
+          x: colX(i3), y: 58, "text-anchor": "middle",
+          "font-size": 9, fill: RED,
+          text: i3 === n ? "C_n" : "C_(n−1)"
+        }));
+      }
     }
+
     lab(86,"A");
-    for (var i4 = 0; i4 < n; i4++) cell(i4,86,(A >>> i4)&1);
+    for (var i4 = 0; i4 < n; i4++) {
+      cell(i4,86,(A >>> i4)&1);
+    }
+
     lab(116,op === "sub" ? "B̄" : "B");
-    for (var i5 = 0; i5 < n; i5++) cell(i5,116,(B >>> i5)&1);
+    for (var i5 = 0; i5 < n; i5++) {
+      cell(i5,116,(B >>> i5)&1);
+    }
+
     svg.appendChild(S("line", {
       x1: x0, y1: 126, x2: x0+n*cw+cw, y2: 126,
       stroke: INK, "stroke-width": 1.6
     }));
+
     lab(154,"Sum");
-    for (var i6 = 0; i6 < n; i6++) cell(i6,154,sum[i6],INK,true);
+    for (var i6 = 0; i6 < n; i6++) {
+      cell(i6,154,sum[i6],INK,true);
+    }
     cell(n,154,c[n],INK,false);
+
     svg.appendChild(S("text", {
       x: x0+(n+1)*cw+10, y: 154, "font-size": 13,
       "font-weight": 700, fill: INK, text: "= " + minus(res)
     }));
+
     svg.appendChild(S("text", {
       x: x0, y: 184, "font-size": 11, fill: INK,
       text: (op === "sub" ? "C_0 = 1. " : "C_0 = 0. ") +
         "각 carry는 다음 상위 비트로 전달되며, C_n은 carry-out."
     }));
+
     box.innerHTML = "";
     box.appendChild(svg);
 
-    var h = "<div>" + (op === "sub" ? "A − B = A + B̄ + 1" : "A + B") +
-      " → 실제 값 " + minus(truth) + ", 비트 결과 <b>" + bin(S2,n) +
-      "</b> = " + minus(res) + "</div>";
-    h += "<div style='margin-top:4px'>C<sub>n−1</sub> = " + c[n-1] +
-      ", C<sub>n</sub> = " + c[n] +
-      " → overflow = C<sub>n−1</sub> XOR C<sub>n</sub> = <b style='color:" +
-      (ovf ? RED : INK) + "'>" + (ovf ? 1 : 0) + "</b></div>";
+    var h = "<div>" +
+      (op === "sub" ? "A − B = A + B̄ + 1" : "A + B") +
+      " → 실제 값 " + minus(truth) + ", 비트 결과 <b>" +
+      bin(S2,n) + "</b> = " + minus(res) + "</div>";
+
+    h += "<div style='margin-top:4px'>C<sub>n−1</sub> = " +
+      c[n-1] + ", C<sub>n</sub> = " + c[n] +
+      " → overflow = C<sub>n−1</sub> XOR C<sub>n</sub> = " +
+      "<b style='color:" + (ovf ? RED : INK) + "'>" +
+      (ovf ? 1 : 0) + "</b></div>";
+
     h += "<div style='margin-top:4px'>" +
-      (ovf ? "<b style='color:"+RED+"'>signed overflow</b>: 실제 값 " +
-        minus(truth) + "이 " + n + "비트 범위 (" + rangeStr(n) +
-        ") 밖이므로 비트 결과 " + minus(res) + "가 실제 값과 다르다."
-       : "signed overflow 없음: 결과가 표현 범위 안이다.") + "</div>";
+      (ovf
+        ? "<b style='color:"+RED+"'>signed overflow</b>: 실제 값 " +
+          minus(truth) + "이 " + n + "비트 범위 (" +
+          rangeStr(n) + ") 밖이므로 비트 결과 " +
+          minus(res) + "가 실제 값과 다르다."
+        : "signed overflow 없음: 결과가 표현 범위 안이다.") +
+      "</div>";
+
     var un = op === "add" ? A+B0 : A-B0;
+
     h += "<div style='margin-top:4px;color:"+INK+"'>unsigned로 보면 " +
       A + (op === "add" ? " + " : " − ") + B0 + " = " + un +
       " (" + (op === "add"
-        ? (c[n] ? "CO=1 → unsigned overflow" : "CO=0 → unsigned 범위 안")
-        : (c[n] ? "CO=1 → borrow 없음" : "CO=0 → unsigned borrow 발생")) +
+        ? (c[n] ? "CO=1 → unsigned overflow" :
+          "CO=0 → unsigned 범위 안")
+        : (c[n] ? "CO=1 → borrow 없음" :
+          "CO=0 → unsigned borrow 발생")) +
       "). signed overflow와 unsigned overflow는 별도로 판정한다.</div>";
-    if (warning) h += "<div style='margin-top:6px;color:"+RED+"'>"+warning+"</div>";
+
+    if (warning) {
+      h += "<div style='margin-top:6px;color:"+RED+"'>"+
+        warning+"</div>";
+    }
+
+    if (inputError) {
+      h += "<div style='margin-top:6px;color:"+RED+";font-size:12.5px' role='status'>"+
+        inputError+"</div>";
+    }
+
     info.innerHTML = h;
 
     ctl.innerHTML = "";
+
     ctl.appendChild(H("label", {text: "비트 수 "}, [sel(
       allowed.map(function(x) { return [x,String(x)]; }), n,
       function(x) {
         var oldA = a, oldB = b;
         n = +x;
+
         var na = clamp(oldA), nb = clamp(oldB);
         warning = (na !== oldA || nb !== oldB)
-          ? "값이 " + n + "비트 범위로 조정됨: A " + minus(oldA) +
-            " → " + minus(na) + ", B " + minus(oldB) + " → " + minus(nb) + "."
+          ? "값이 " + n + "비트 범위로 조정됨: A " +
+            minus(oldA) + " → " + minus(na) + ", B " +
+            minus(oldB) + " → " + minus(nb) + "."
           : "";
+
         a = na;
         b = nb;
+        inputError = "";
         render();
       }
     )]));
+
     function numIn(label,get,set,key) {
       var i = txt(String(get()),56,function(v) {
-        if (!/^[+-]?\d+$/.test(v.trim())) return;
-        var x = Number(v);
-        if (!Number.isSafeInteger(x)) return;
-        var adjusted = clamp(x);
-        warning = adjusted !== x
-          ? label + " 값이 " + n + "비트 범위로 조정됨: " +
-            minus(x) + " → " + minus(adjusted) + "."
-          : "";
-        set(adjusted);
-        render();
+        // txt 헬퍼의 콜백이 input 이벤트여도 입력 중에는
+        // 판정하지 않는다. change 이벤트에서 확정한다.
       });
+
       i.setAttribute("data-k",key);
+      i.setAttribute("inputmode","numeric");
+      i.setAttribute("aria-label",label);
+
+      function commit() {
+        var v = i.value.trim();
+        var x = Number(v);
+
+        if (v === "" || !/^[+-]?\d+$/.test(v) ||
+            !Number.isSafeInteger(x)) {
+          inputError = label + ": 유효한 정수를 입력하세요. 이전 값으로 복구했습니다.";
+          i.value = String(get());
+          render();
+          return;
+        }
+
+        var lim = Math.pow(2,n-1);
+        if (x < -lim || x >= lim) {
+          inputError = label + ": " + x + "은(는) " +
+            n + "비트 범위 (" + rangeStr(n) +
+            ") 밖입니다. 이전 값으로 복구했습니다.";
+          i.value = String(get());
+          render();
+          return;
+        }
+
+        set(x);
+        warning = "";
+        inputError = "";
+        render();
+      }
+
+      i.addEventListener("change",commit);
+      i.addEventListener("keydown",function(ev) {
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          commit();
+        }
+      });
+
       return H("label",{text:label+" "},[i]);
     }
+
     ctl.appendChild(numIn("A",function(){return a;},function(v){a=v;},"a"));
     ctl.appendChild(numIn("B",function(){return b;},function(v){b=v;},"b"));
-    var bAdd = btn("A + B",function(){op="add";render();});
-    var bSub = btn("A − B",function(){op="sub";render();});
-    (op === "add" ? bAdd : bSub).style.cssText += "background:"+INK+";color:#fff";
+
+    var bAdd = btn("A + B",function() {
+      op = "add";
+      render();
+    });
+    var bSub = btn("A − B",function() {
+      op = "sub";
+      render();
+    });
+
+    (op === "add" ? bAdd : bSub).style.cssText +=
+      "background:"+INK+";color:#fff";
+
     ctl.appendChild(bAdd);
     ctl.appendChild(bSub);
     ctl.appendChild(H("span", {
-      text: "입력 범위: " + rangeStr(n), style: "color:"+INK
+      text: "입력 범위: " + rangeStr(n),
+      style: "color:"+INK
     }));
   }
+
   render();
 });
 
@@ -2088,57 +2436,82 @@ function toBinStr(v,w){var s=v.toString(2);while(s.length<w)s="0"+s;return s;}
 reg("ieee754", function(el, cfg) {
   V6.title(el, cfg.title || "IEEE 754 비트 분해");
   cfg = cfg || {};
+
   var fk = FMT[cfg.format] ? cfg.format : "single";
   var fmt = FMT[fk];
   var input = cfg.value === undefined ? "-6.25" : String(cfg.value);
   var bits = 0n, typed = null, formatNotice = "";
+
   function setFromText(t) {
     var x, tt = t.trim().toLowerCase();
-    if (tt === "inf" || tt === "+inf" || tt === "infinity") x = Infinity;
-    else if (tt === "-inf" || tt === "-infinity") x = -Infinity;
-    else if (tt === "nan") x = NaN;
-    else {
+
+    if (tt === "inf" || tt === "+inf" || tt === "infinity") {
+      x = Infinity;
+    } else if (tt === "-inf" || tt === "-infinity") {
+      x = -Infinity;
+    } else if (tt === "nan") {
+      x = NaN;
+    } else {
       if (tt === "" || isNaN(Number(tt))) return false;
       x = Number(tt);
     }
+
     typed = x;
     bits = encodeFloat(x, fmt);
     return true;
   }
+
   setFromText(input);
 
   var ctl = row(), box = H("div"), info = noteBox();
-  var err = H("span", {style: "color:"+RED+";font-size:12.5px"});
+  var err = H("span", {
+    style: "color:"+RED+";font-size:12.5px"
+  });
+
   el.appendChild(ctl);
   el.appendChild(box);
   el.appendChild(info);
 
   function sameValue(a,b) {
-    return Object.is ? Object.is(a,b) : (a === b || (a !== a && b !== b));
+    return Object.is
+      ? Object.is(a,b)
+      : (a === b || (a !== a && b !== b));
   }
 
   function render() {
     var tot = 1+fmt.e+fmt.f, o = decodeFloat(bits,fmt);
     box.innerHTML = "";
+
     function group(label,from,len,color) {
       var g = H("div", {
         style: "display:inline-block;vertical-align:top;margin:0 10px 8px 0"
       });
+
       g.appendChild(H("div", {
         text: label,
-        style: "font-size:11px;font-weight:700;letter-spacing:.04em;color:"+color+";margin-bottom:2px"
+        style: "font-size:11px;font-weight:700;letter-spacing:.04em;color:"+
+          color+";margin-bottom:2px"
       }));
+
       var wrap = H("div", {
-        style: "display:flex;flex-wrap:wrap;gap:2px;max-width:"+Math.min(len,32)*21+"px"
+        style: "display:flex;flex-wrap:wrap;gap:2px;max-width:"+
+          Math.min(len,32)*21+"px"
       });
+
       for (var i=0;i<len;i++) {
         (function(pos) {
           var bit = Number((bits >> big(pos)) & 1n);
-          var c = H("button",{type:"button",text:String(bit)});
-          c.style.cssText = "width:19px;height:26px;padding:0;font-family:Consolas,monospace;" +
+          var c = H("button", {
+            type:"button",
+            text:String(bit)
+          });
+
+          c.style.cssText =
+            "width:19px;height:26px;padding:0;font-family:Consolas,monospace;" +
             "font-size:13px;font-weight:700;border:1.4px solid "+color+
-            ";border-radius:2px;cursor:pointer;background:"+(bit?color:"#fff")+
-            ";color:"+(bit?"#fff":color);
+            ";border-radius:2px;cursor:pointer;background:"+
+            (bit?color:"#fff")+";color:"+(bit?"#fff":color);
+
           c.onclick = function() {
             bits ^= (1n << big(pos));
             typed = null;
@@ -2146,87 +2519,143 @@ reg("ieee754", function(el, cfg) {
             formatNotice = "";
             render();
           };
+
           wrap.appendChild(c);
         })(from-1-i);
       }
+
       g.appendChild(wrap);
       box.appendChild(g);
     }
+
     group("부호 s",tot,1,RED);
-    group("지수 e ("+fmt.e+"비트, 편향 "+fmt.bias+")",fmt.e+fmt.f,fmt.e,INK);
+    group("지수 e ("+fmt.e+"비트, 편향 "+fmt.bias+")",
+      fmt.e+fmt.f,fmt.e,INK);
     group("가수 f ("+fmt.f+"비트)",fmt.f,fmt.f,INK);
 
     var eStr = toBinStr(BigInt(o.e),fmt.e);
     var fStr = toBinStr(o.f,fmt.f);
     var bitString = toBinStr(bits,tot);
     var hex = "0x";
+
     for (var hi=0;hi<bitString.length;hi+=4) {
       hex += parseInt(bitString.slice(hi,hi+4),2).toString(16);
     }
     hex = hex.toUpperCase();
 
     var h = "<table><tr><th>필드</th><th>비트</th><th>해석</th></tr>";
-    h += "<tr><td>부호 s</td><td>"+o.s+"</td><td>(−1)<sup>"+o.s+"</sup> = "+(o.s?"−1":"+1")+"</td></tr>";
+    h += "<tr><td>부호 s</td><td>"+o.s+"</td><td>(−1)<sup>"+
+      o.s+"</sup> = "+(o.s?"−1":"+1")+"</td></tr>";
+
     h += "<tr><td>지수 e</td><td>"+eStr+"</td><td>e = "+o.e;
-    if (o.cls === "normal") h += ", E = e − "+o.bias+" = <b>"+o.E+"</b>";
-    else if (o.cls === "subnormal") h += " (0), E = 1 − "+o.bias+" = <b>"+o.E+"</b>";
-    else if (o.cls === "zero") h += " (0, zero)";
-    else h += " (all ones)";
+
+    if (o.cls === "normal") {
+      h += ", E = e − "+o.bias+" = <b>"+o.E+"</b>";
+    } else if (o.cls === "subnormal") {
+      h += " (0), E = 1 − "+o.bias+" = <b>"+o.E+"</b>";
+    } else if (o.cls === "zero") {
+      h += " (0, zero)";
+    } else {
+      h += " (all ones)";
+    }
+
     h += "</td></tr>";
 
     var sig = "";
     if (o.cls === "normal" || o.cls === "subnormal") {
       sig = exactDecimal(o.N,o.X);
     }
+
     var fShow = fStr.replace(/0+$/,"");
-    h += "<tr><td>가수 f</td><td style='word-break:break-all'>"+fStr+"</td><td>";
-    if (o.cls === "normal") h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = "+sig;
-    else if (o.cls === "subnormal") h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = "+sig;
-    else if (o.cls === "nan") h += "f ≠ 0: NaN payload";
-    else h += "f = 0";
+    h += "<tr><td>가수 f</td><td style='word-break:break-all'>"+
+      fStr+"</td><td>";
+
+    if (o.cls === "normal") {
+      h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = "+sig;
+    } else if (o.cls === "subnormal") {
+      h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = "+sig;
+    } else if (o.cls === "nan") {
+      h += "f ≠ 0: NaN payload";
+    } else {
+      h += "f = 0";
+    }
+
     h += "</td></tr></table>";
 
     var val, exact;
-    if (o.cls === "nan") { val = "NaN"; exact = ""; }
-    else if (o.cls === "inf") { val = (o.s?"−":"+")+"∞"; exact = ""; }
-    else {
+
+    if (o.cls === "nan") {
+      val = "NaN";
+      exact = "";
+    } else if (o.cls === "inf") {
+      val = (o.s?"−":"+")+"∞";
+      exact = "";
+    } else {
       exact = exactDecimal(o.N,o.X);
       val = (o.s?"−":"")+exact;
     }
+
     h += "<div style='margin-top:8px'>분류: <b>" +
-      ({normal:"normalized",subnormal:"denormalized (subnormal)",
-        zero:o.s?"−0":"+0",inf:"±∞",nan:"NaN"}[o.cls]) + "</b>";
+      ({
+        normal:"normalized",
+        subnormal:"denormalized (subnormal)",
+        zero:o.s?"−0":"+0",
+        inf:"±∞",
+        nan:"NaN"
+      }[o.cls]) + "</b>";
+
     if (o.cls === "normal") {
-      h += "<br>값 = (−1)<sup>"+o.s+"</sup> × 1.f × 2<sup>"+o.E+
-        "</sup> = "+(o.s?"−1":"1")+" × "+sig+" × 2<sup>"+o.E+"</sup>";
+      h += "<br>값 = (−1)<sup>"+o.s+"</sup> × 1.f × 2<sup>"+
+        o.E+"</sup> = "+(o.s?"−1":"1")+" × "+sig+
+        " × 2<sup>"+o.E+"</sup>";
     }
+
     if (o.cls === "subnormal") {
-      h += "<br>값 = (−1)<sup>"+o.s+"</sup> × 0.f × 2<sup>1−bias</sup> = "+
+      h += "<br>값 = (−1)<sup>"+o.s+
+        "</sup> × 0.f × 2<sup>1−bias</sup> = "+
         (o.s?"−1":"1")+" × "+sig+" × 2<sup>"+o.E+"</sup>";
     }
-    var vshow = val.length>70 ? val.slice(0,70)+"… ("+val.length+"자리)" : val;
-    h += "<br>저장된 값(정확한 십진값) = <b style='color:"+RED+";word-break:break-all'>"+
-      vshow+"</b>";
+
+    var vshow = val.length>70
+      ? val.slice(0,70)+"… ("+val.length+"자리)"
+      : val;
+
+    h += "<br>저장된 값(정확한 십진값) = <b style='color:"+RED+
+      ";word-break:break-all'>"+vshow+"</b>";
+
     if (o.cls === "normal" || o.cls === "subnormal") {
-      h += "<br><span style='color:"+INK+"'>인접 표현 간격(ulp) = 2<sup>"+o.X+
-        "</sup> = "+(o.X>-60 ? exactDecimal(1n,o.X) : "2^"+o.X)+"</span>";
+      h += "<br><span style='color:"+INK+"'>인접 표현 간격(ulp) = 2<sup>"+
+        o.X+"</sup> = "+
+        (o.X>-60 ? exactDecimal(1n,o.X) : "2^"+o.X)+"</span>";
     }
+
     h += "<br><span style='color:"+INK+"'>16진수 "+hex+"</span>";
 
-    if (typed !== null && isFinite(typed) && o.cls !== "nan" && o.cls !== "inf") {
+    if (typed !== null && isFinite(typed) &&
+        o.cls !== "nan" && o.cls !== "inf") {
       var same = sameValue(numFromDecoded(o),typed);
-      var mm = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.exec(String(input).trim());
+      var mm = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.exec(
+        String(input).trim()
+      );
+
       if (mm) {
-        var ds = String(input).trim().replace(/^[+-]/,""), ex2 = 0;
+        var ds = String(input).trim().replace(/^[+-]/,"");
+        var ex2 = 0;
         var eidx = ds.search(/e/i);
+
         if (eidx >= 0) {
           ex2 = parseInt(ds.slice(eidx+1),10);
           ds = ds.slice(0,eidx);
         }
-        var dot = ds.indexOf("."), fl = dot >= 0 ? ds.length-dot-1 : 0;
+
+        var dot = ds.indexOf(".");
+        var fl = dot >= 0 ? ds.length-dot-1 : 0;
         var digits = ds.replace(".","");
+
         if (/^\d+$/.test(digits)) {
-          var M = BigInt(digits || "0"), e10 = ex2-fl;
+          var M = BigInt(digits || "0");
+          var e10 = ex2-fl;
+
           if (e10 >= 0) {
             var lhs = M * (10n**big(e10));
             var rhs = o.N * (2n**big(Math.max(o.X,0))) *
@@ -2241,61 +2670,93 @@ reg("ieee754", function(el, cfg) {
           }
         }
       }
+
       h += "<br>"+(same
         ? "입력값 "+input+"은(는) 이 형식에서 정확히 표현된다."
         : "입력값 "+input+"은(는) 정확히 표현되지 않아 가장 가까운 값으로 반올림된다.");
     }
+
     if (o.cls === "inf" && typed !== null && isFinite(typed)) {
-      h += "<br><span style='color:"+RED+"'>입력값이 이 형식의 범위를 넘어 ∞로 overflow했다.</span>";
+      h += "<br><span style='color:"+RED+
+        "'>입력값이 이 형식의 범위를 넘어 ∞로 overflow했다.</span>";
     }
+
     if (formatNotice) {
-      h += "<div style='margin-top:6px;color:"+RED+"'>"+formatNotice+"</div>";
+      h += "<div style='margin-top:6px;color:"+RED+"'>"+
+        formatNotice+"</div>";
     }
+
     h += "</div>";
     info.innerHTML = h;
 
+    // 입력 해석 방식과 NaN payload 보존의 한계를 명시한다.
+    info.appendChild(H("div", {
+      text: "십진 입력은 먼저 JavaScript Number(double)로 해석되며, half/single은 그 값에서 다시 반올림된다.",
+      style: "margin-top:8px;color:"+INK+";font-size:12.5px"
+    }));
+
     ctl.innerHTML = "";
+
     ctl.appendChild(H("label",{text:"형식 "},[sel(
       [["half","half (16)"],["single","single (32)"],["double","double (64)"]],
       fk,function(k) {
-        // 형식 변경은 현재 비트 패턴이 나타내는 값을 보존한다.
-        // 직접 편집된 NaN도 NaN으로 변환한다.
         var old = decodeFloat(bits,fmt);
         var oldValue = numFromDecoded(old);
-        var oldFmt = fmt;
+        var oldWasNaN = old.cls === "nan";
+
         fk = k;
         fmt = FMT[k];
         bits = encodeFloat(oldValue,fmt);
         typed = oldValue;
         input = String(oldValue);
+
         formatNotice = "형식 변경은 값 보존(반올림될 수 있음).";
-        var newValue = numFromDecoded(decodeFloat(bits,fmt));
-        if (!sameValue(oldValue,newValue)) {
-          formatNotice += " 이전 값 " + String(oldValue) +
-            "이 새 형식에서 " + String(newValue) + "로 반올림되었습니다.";
+
+        if (oldWasNaN) {
+          formatNotice +=
+            " NaN은 유지되지만, 형식 변경時 payload는 보존되지 않는다.";
         } else {
-          formatNotice += " 이 경우 값이 그대로 보존되었습니다.";
+          var newValue = numFromDecoded(decodeFloat(bits,fmt));
+
+          if (!sameValue(oldValue,newValue)) {
+            formatNotice += " 이전 값 " + String(oldValue) +
+              "이 새 형식에서 " + String(newValue) +
+              "로 반올림되었습니다.";
+          } else {
+            formatNotice += " 이 경우 값이 그대로 보존되었습니다.";
+          }
         }
+
         render();
       }
     )]));
+
     ctl.appendChild(H("span", {
       text:"형식 변경은 값 보존(반올림될 수 있음).",
       style:"font-size:12px;color:"+INK
     }));
+
     var inp = txt(input===null?"":input,130,function(v) {
       input = v;
+
       if (setFromText(v)) {
         err.textContent = "";
         formatNotice = "";
         renderKeep();
-      } else err.textContent = v.trim()==="" ? "" : "숫자, inf, nan 중 하나를 입력";
+      } else {
+        err.textContent = v.trim()===""
+          ? ""
+          : "숫자, inf, nan 중 하나를 입력";
+      }
     },"-6.25");
+
     ctl.appendChild(H("label",{text:"10진 입력 "},[inp]));
     ctl.appendChild(err);
+
     function renderKeep() {
       var v = inp.value;
       render();
+
       var ni = ctl.querySelector("input[type=text]");
       if (ni) {
         ni.value = v;
@@ -2303,13 +2764,24 @@ reg("ieee754", function(el, cfg) {
         ni.setSelectionRange(v.length,v.length);
       }
     }
-    [["0.1","0.1"],["−6.25","-6.25"],["1/3","0.3333333333333333"],
-     ["최댓값","max"],["∞","inf"],["NaN","nan"],["−0","-0"]].forEach(function(p) {
+
+    [
+      ["0.1","0.1"],
+      ["−6.25","-6.25"],
+      ["1/3","0.3333333333333333"],
+      ["최댓값","max"],
+      ["∞","inf"],
+      ["NaN","nan"],
+      ["−0","-0"]
+    ].forEach(function(p) {
       ctl.appendChild(btn(p[0],function() {
         var v = p[1];
+
         if (v === "max") {
-          v = String(Math.pow(2,fmt.bias)*(2-Math.pow(2,-fmt.f)));
+          v = String(Math.pow(2,fmt.bias) *
+            (2-Math.pow(2,-fmt.f)));
         }
+
         input = v;
         setFromText(v);
         formatNotice = "";
@@ -2317,6 +2789,7 @@ reg("ieee754", function(el, cfg) {
       }));
     });
   }
+
   render();
 });
 
