@@ -2576,7 +2576,7 @@ reg("ieee754", function(el, cfg) {
       sig = exactDecimal(o.N, -fmt.f);
     }
 
-    var fShow = fStr.replace(/0+$/,"");
+    var fShow = fStr.replace(/0+$/,"") || "0";
     h += "<tr><td>가수 f</td><td style='word-break:break-all'>"+
       fStr+"</td><td>";
 
@@ -2626,8 +2626,9 @@ reg("ieee754", function(el, cfg) {
         (o.s?"−1":"1")+" × <span style='white-space:nowrap;font-size:12.5px;color:"+INK+"'>"+sig+"</span> × 2<sup>"+o.E+"</sup>";
     }
 
+    var digits=val.replace(/[+\-.−]/g,"").length;
     var vshow = val.length>70
-      ? val.slice(0,70)+"… ("+val.length+"자리)"
+      ? val.slice(0,70)+"… (숫자 "+digits+"자리)"
       : val;
 
     if (val.length > 70) {
@@ -2642,7 +2643,7 @@ reg("ieee754", function(el, cfg) {
       h += "<br><span style='color:"+INK+"'>인접 표현 간격(ulp) = 2<sup>"+
         o.X+"</sup> = "+
         "<span style='word-break:break-all'>"+
-        (o.X>-60 ? exactDecimal(1n,o.X) : "2^"+o.X)+"</span></span>";
+        (o.X>-60 ? exactDecimal(1n,o.X) : "10진 전개 생략")+"</span></span>";
     }
 
     h += "<br><span style='color:"+INK+"'>16진수 "+hex+"</span>";
