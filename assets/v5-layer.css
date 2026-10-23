@@ -144,3 +144,6 @@ html[data-theme="dark"] select,html[data-theme="dark"] option,html[data-theme="d
 /* 'Step N' 라벨형 단계 목록(ol.steps.step-label)은 라벨과 본문 사이 간격 보장 */
 .body.notes ol.steps.step-label>li{padding-left:5.6em}
 @media(max-width:560px){.body.notes ol.steps.step-label>li{padding-left:5em}}
+
+/* Keep the existing ALU overview together at narrow widths. */
+figure svg.alu-overview{max-width:100% !important}

@@ -2573,7 +2573,7 @@ reg("ieee754", function(el, cfg) {
 
     var sig = "";
     if (o.cls === "normal" || o.cls === "subnormal") {
-      sig = exactDecimal(o.N, big(-fmt.f));
+      sig = exactDecimal(o.N, -fmt.f);
     }
 
     var fShow = fStr.replace(/0+$/,"");
@@ -2581,9 +2581,9 @@ reg("ieee754", function(el, cfg) {
       fStr+"</td><td>";
 
     if (o.cls === "normal") {
-      h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
+      h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = <span style='white-space:nowrap;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
     } else if (o.cls === "subnormal") {
-      h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
+      h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = <span style='white-space:nowrap;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
     } else if (o.cls === "nan") {
       h += "f ≠ 0: NaN payload";
     } else {
@@ -2616,22 +2616,27 @@ reg("ieee754", function(el, cfg) {
 
     if (o.cls === "normal") {
       h += "<br>값 = (−1)<sup>"+o.s+"</sup> × 1.f × 2<sup>"+
-        o.E+"</sup> = "+(o.s?"−1":"1")+" × <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>"+
+        o.E+"</sup> = "+(o.s?"−1":"1")+" × <span style='white-space:nowrap;font-size:12.5px;color:"+INK+"'>"+sig+"</span>"+
         " × 2<sup>"+o.E+"</sup>";
     }
 
     if (o.cls === "subnormal") {
       h += "<br>값 = (−1)<sup>"+o.s+
         "</sup> × 0.f × 2<sup>1−bias</sup> = "+
-        (o.s?"−1":"1")+" × <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span> × 2<sup>"+o.E+"</sup>";
+        (o.s?"−1":"1")+" × <span style='white-space:nowrap;font-size:12.5px;color:"+INK+"'>"+sig+"</span> × 2<sup>"+o.E+"</sup>";
     }
 
     var vshow = val.length>70
       ? val.slice(0,70)+"… ("+val.length+"자리)"
       : val;
 
-    h += "<br>저장된 값(정확한 십진값) = <b style='color:"+RED+
-      ";word-break:break-all'>"+vshow+"</b>";
+    if (val.length > 70) {
+      h += "<br>저장된 값(정확한 십진값) = <span style='font-size:12.5px;color:"+
+        INK+";word-break:break-all'>"+vshow+"</span>";
+    } else {
+      h += "<br>저장된 값(정확한 십진값) = <b style='color:"+RED+
+        ";word-break:break-all'>"+vshow+"</b>";
+    }
 
     if (o.cls === "normal" || o.cls === "subnormal") {
       h += "<br><span style='color:"+INK+"'>인접 표현 간격(ulp) = 2<sup>"+
