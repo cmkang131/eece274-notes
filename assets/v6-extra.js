@@ -2464,10 +2464,16 @@ reg("ieee754", function(el, cfg) {
   setFromText(input);
 
   var ctl = row(), box = H("div"), info = noteBox();
+  var hint = H("div", {
+    text: "10진 값을 입력하거나 비트를 탭해 바꾸면, 아래 표와 값 공식이 바로 갱신된다.",
+    style: "font-size:12.5px;color:"+INK+";margin:2px 0 8px"
+  });
+
   var err = H("span", {
     style: "color:"+RED+";font-size:12.5px"
   });
 
+  el.appendChild(hint);
   el.appendChild(ctl);
   el.appendChild(box);
   el.appendChild(info);
@@ -2484,7 +2490,7 @@ reg("ieee754", function(el, cfg) {
 
     function group(label,from,len,color) {
       var g = H("div", {
-        style: "display:inline-block;vertical-align:top;margin:0 10px 8px 0"
+        style: "display:inline-block;vertical-align:top;margin:0 10px 8px 0;max-width:100%"
       });
 
       g.appendChild(H("div", {
@@ -2493,9 +2499,12 @@ reg("ieee754", function(el, cfg) {
           color+";margin-bottom:2px"
       }));
 
+      var scroller = H("div", {
+        style: "overflow-x:auto;max-width:100%;padding-bottom:4px"
+      });
+
       var wrap = H("div", {
-        style: "display:flex;flex-wrap:wrap;gap:2px;max-width:"+
-          Math.min(len,32)*21+"px"
+        style: "display:flex;flex-wrap:nowrap;gap:2px;width:max-content"
       });
 
       for (var i=0;i<len;i++) {
@@ -2524,7 +2533,8 @@ reg("ieee754", function(el, cfg) {
         })(from-1-i);
       }
 
-      g.appendChild(wrap);
+      scroller.appendChild(wrap);
+      g.appendChild(scroller);
       box.appendChild(g);
     }
 
@@ -2571,9 +2581,9 @@ reg("ieee754", function(el, cfg) {
       fStr+"</td><td>";
 
     if (o.cls === "normal") {
-      h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = "+sig;
+      h += "암묵적 1을 붙여 1."+fShow+"<sub>2</sub> = <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
     } else if (o.cls === "subnormal") {
-      h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = "+sig;
+      h += "암묵적 1 없이 0."+fShow+"<sub>2</sub> = <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>";
     } else if (o.cls === "nan") {
       h += "f ≠ 0: NaN payload";
     } else {
@@ -2597,8 +2607,8 @@ reg("ieee754", function(el, cfg) {
 
     h += "<div style='margin-top:8px'>분류: <b>" +
       ({
-        normal:"normalized",
-        subnormal:"denormalized (subnormal)",
+        normal:"normalized (정규화: 암묵적 1을 쓰는 보통 범위)",
+        subnormal:"denormalized (subnormal: 암묵적 1 없이 0.f로 아주 작은 값)",
         zero:o.s?"−0":"+0",
         inf:"±∞",
         nan:"NaN"
@@ -2606,14 +2616,14 @@ reg("ieee754", function(el, cfg) {
 
     if (o.cls === "normal") {
       h += "<br>값 = (−1)<sup>"+o.s+"</sup> × 1.f × 2<sup>"+
-        o.E+"</sup> = "+(o.s?"−1":"1")+" × "+sig+
+        o.E+"</sup> = "+(o.s?"−1":"1")+" × <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span>"+
         " × 2<sup>"+o.E+"</sup>";
     }
 
     if (o.cls === "subnormal") {
       h += "<br>값 = (−1)<sup>"+o.s+
         "</sup> × 0.f × 2<sup>1−bias</sup> = "+
-        (o.s?"−1":"1")+" × "+sig+" × 2<sup>"+o.E+"</sup>";
+        (o.s?"−1":"1")+" × <span style='word-break:break-all;font-size:12.5px;color:"+INK+"'>"+sig+"</span> × 2<sup>"+o.E+"</sup>";
     }
 
     var vshow = val.length>70
@@ -2626,7 +2636,8 @@ reg("ieee754", function(el, cfg) {
     if (o.cls === "normal" || o.cls === "subnormal") {
       h += "<br><span style='color:"+INK+"'>인접 표현 간격(ulp) = 2<sup>"+
         o.X+"</sup> = "+
-        (o.X>-60 ? exactDecimal(1n,o.X) : "2^"+o.X)+"</span>";
+        "<span style='word-break:break-all'>"+
+        (o.X>-60 ? exactDecimal(1n,o.X) : "2^"+o.X)+"</span></span>";
     }
 
     h += "<br><span style='color:"+INK+"'>16진수 "+hex+"</span>";
