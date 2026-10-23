@@ -115,6 +115,12 @@ html[data-theme="dark"] .tblwrap.can-r::after{background:linear-gradient(to righ
 html[data-theme="dark"] svg [fill="#fff"],html[data-theme="dark"] svg [fill="#ffffff"]{fill:#ededed}
 html[data-theme="dark"] svg [fill="#f2f2f2"]{fill:#e0e0e0}
 html[data-theme="dark"] details.v5d[open]>summary{background:#e0e0e0}
+/* 13. 다크 모드(invert) 보강 2026-10-23 — 라이트 모드 무변경, CSS 만.
+   이미지(래스터)는 반전 상쇄, 코드·폼·위젯 배경은 페이지와 같은 톤, 스크롤바는 다크 */
+html[data-theme="dark"]{scrollbar-color:#5a5a5a #1a1a1a}
+html[data-theme="dark"] img,html[data-theme="dark"] picture,html[data-theme="dark"] video{filter:invert(1) hue-rotate(180deg)}
+html[data-theme="dark"] pre,html[data-theme="dark"] code,html[data-theme="dark"] kbd,html[data-theme="dark"] samp{background-color:#ededed}
+html[data-theme="dark"] select,html[data-theme="dark"] option,html[data-theme="dark"] textarea,html[data-theme="dark"] button,html[data-theme="dark"] .v6-btn,html[data-theme="dark"] .v6-widget{background-color:#ededed;color:inherit}
 
 /* 13. 인쇄 */
 @media print{
