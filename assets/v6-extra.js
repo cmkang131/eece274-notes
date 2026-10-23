@@ -2573,7 +2573,7 @@ reg("ieee754", function(el, cfg) {
 
     var sig = "";
     if (o.cls === "normal" || o.cls === "subnormal") {
-      sig = exactDecimal(o.N,o.X);
+      sig = exactDecimal(o.N, big(-fmt.f));
     }
 
     var fShow = fStr.replace(/0+$/,"");

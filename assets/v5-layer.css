@@ -95,8 +95,7 @@ nav.v5-toc a.active,.toc a.active{background:var(--hl);font-weight:700}
 .to-top{position:fixed;right:14px;bottom:14px;z-index:40;border:1px solid var(--ink);background:#fff;padding:.3em .75em;font-size:13px;text-decoration:none!important;color:var(--gray)!important;opacity:0;pointer-events:none;transition:opacity .15s}
 .to-top.show{opacity:1;pointer-events:auto}
 .to-top:hover{background:var(--hl);color:var(--ink)!important}
-@media (max-width:480px){.to-top{right:10px;bottom:10px;width:40px;height:40px;min-height:40px;padding:0;justify-content:center;font-size:0;border-radius:50%}
-.to-top::after{content:"\2191";font-size:16px}}
+@media (max-width:480px){.to-top{display:none}}
 .skip-link{position:absolute;left:-9999px;top:0;z-index:100;background:var(--hl);padding:.5em 1em;border:1px solid var(--ink);text-decoration:none}
 .skip-link:focus{left:0}
 /* 단일 항목 섹션: 제목은 스크린리더용으로만 */
