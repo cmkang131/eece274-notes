@@ -147,3 +147,5 @@ html[data-theme="dark"] select,html[data-theme="dark"] option,html[data-theme="d
 
 /* Keep the existing ALU overview together at narrow widths. */
 figure svg.alu-overview{max-width:100% !important}
+
+@media(max-width:480px){.to-top{display:none !important}}
