@@ -30,7 +30,7 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;backg
 svg{max-width:100%}
 
 /* ---------- 페이지 골격 ---------- */
-.paper{max-width:780px;margin:0 auto;background:var(--paper-bg,#fff);padding:28px 40px 56px}
+.paper{max-width:900px;margin:0 auto;background:var(--paper-bg,#fff);padding:28px 44px 56px}
 .phead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--gray);padding-bottom:12px;border-bottom:1px solid var(--rule)}
 a.to-home{color:var(--ink);text-decoration:none;cursor:pointer;border-bottom:1px solid #999;white-space:nowrap;font-size:13px}
 a.to-home:hover{color:var(--blue);border-color:var(--blue)}
@@ -71,7 +71,7 @@ h1.pagetitle{font-size:25px;font-weight:900;letter-spacing:-0.01em;margin:22px 0
 .tblwrap{overflow-x:auto;margin:18px 0}
 .notes table{border-collapse:collapse;width:100%;margin:18px 0;font-size:15px;font-variant-numeric:tabular-nums;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
 .tblwrap table{margin:0}
-.notes td,.notes th{border:none;padding:9px 12px;vertical-align:top;line-height:1.65;text-align:left}
+.notes td,.notes th{border:none;padding:10px 12px;vertical-align:top;line-height:1.7;text-align:left}
 .notes thead th{border-bottom:1px solid var(--rule);font-weight:700;white-space:nowrap}
 .notes tbody tr+tr td,.notes tbody tr+tr th{border-top:1px solid #e2e2e2}
 .notes table .num{text-align:right}
