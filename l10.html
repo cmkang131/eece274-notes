@@ -26,9 +26,7 @@
 <h2><span class="h2no">10.1</span>ALU (교재 5.7)</h2><ul><li>ALU(arithmetic logic unit): 정수 이진수에 산술 또는 논리 연산을 수행하는 조합 네트워크. 부동소수점 수를 다루는 FPU 와 대비됨.</li><li>1비트 slice 를 설계하고 cascade 해서 multi-bit 구조를 만듦. 성능을 제한하는 요인은 carry 의 전파.</li></ul>
 <div class="figwrap static-widget">
 <div class="v6-title">참고: IEEE 754 부동소수점 비트 분해 (FPU 가 다루는 수 표현)</div>
-<img src="assets/static/l10-ieee754.png" alt="참고: IEEE 754 부동소수점 비트 분해 (FPU 가 다루는 수 표현)">
-<div class="v6-params">기본값: 형식 single (32) · 10진 입력 -6.25</div>
-<div class="v6x-read">부호 s<br>지수 e (8비트, 편향 127)<br>가수 f (23비트)<br><table><tr><td>필드</td><td>비트</td><td>해석</td></tr><tr><td>부호 s</td><td>1</td><td>(−1)1 = −1</td></tr><tr><td>지수 e</td><td>10000001</td><td>e = 129, E = e − 127 = 2</td></tr><tr><td>가수 f</td><td>10010000000000000000000</td><td>암묵적 1을 붙여 1.1001₂ = 1.5625</td></tr></table><br>분류: normalized (정규화: 암묵적 1을 쓰는 보통 범위)<br>값 = (−1)¹ × 1.f × 2² = −1 × 1.5625 × 2²<br>저장된 값(정확한 십진값) = −6.25<br>인접 표현 간격(ulp) = 2⁻²¹ = 0.000000476837158203125<br>16진수 0XC0C80000<br>입력값 -6.25은(는) 이 형식에서 정확히 표현된다.<br>십진 입력은 먼저 JavaScript Number(double)로 해석되며, half/single은 그 값에서 다시 반올림된다.</div>
+<div class="bx"><p>부호 s</p><p>지수 e (8비트, 편향 127)</p><p>가수 f (23비트)</p><p>필드비트해석부호 s1(−1)1 = −1지수 e10000001e = 129, E = e − 127 = 2가수 f10010000000000000000000암묵적 1을 붙여 1.1001₂ = 1.5625</p><p>저장된 값(정확한 십진값) = −6.25</p><p>인접 표현 간격(ulp) = 2⁻²¹ = 0.000000476837158203125</p><p>16진수 0XC0C80000</p><p>입력값 -6.25은(는) 이 형식에서 정확히 표현된다.</p><p>십진 입력은 먼저 JavaScript Number(double)로 해석되며, half/single은 그 값에서 다시 반올림된다.</p></div>
 </div>
 <figure><svg class="alu-overview" viewBox="0 0 340 260" width="340" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto" role="img" aria-label="ALU inputs and outputs">
 <g fill="none" stroke="#1a1a1a" stroke-width="1.6"><path d="M100,70 L140,70 L160,92 L180,70 L220,70 L200,170 L120,170 Z"/><path d="M130,44 V70 M190,44 V70 M60,100 H106 M60,125 H111 M60,150 H116 M160,170 V205 M210,120 H245 V170"/></g>
